@@ -30,10 +30,6 @@ import ProductPackageOperation from './pages/product-management/product-package/
 
 import Payment from './pages/payment-management/payment'
 import PaymentOperation from './pages/payment-management/payment/edit.vue'
-import Compliment from './pages/payment-management/compliment'
-import ComplimentOperation from './pages/payment-management/compliment/edit.vue'
-import Driver from './pages/payment-management/driver'
-import DriverOperation from './pages/payment-management/driver/edit.vue'
 
 Vue.use(Router)
 
@@ -327,56 +323,6 @@ export function createRouter() {
         name: 'Payment Management / Payment / Edit',
         meta: {
           title: 'Payment Edit',
-        },
-      },
-
-      {
-        path: '/payment-management/compliment',
-        component: Compliment,
-        name: 'Payment Management / Compliment',
-        meta: {
-          title: 'Compliment',
-        },
-      },
-      {
-        path: '/payment-management/compliment/add',
-        component: ComplimentOperation,
-        name: 'Payment Management / Compliment / Add',
-        meta: {
-          title: 'Compliment Add',
-        },
-      },
-      {
-        path: '/payment-management/compliment/:id',
-        component: ComplimentOperation,
-        name: 'Payment Management / Compliment / Edit',
-        meta: {
-          title: 'Compliment Edit',
-        },
-      },
-
-      {
-        path: '/payment-management/driver',
-        component: Driver,
-        name: 'Payment Management / Driver Online',
-        meta: {
-          title: 'Driver Online',
-        },
-      },
-      {
-        path: '/payment-management/driver/add',
-        component: DriverOperation,
-        name: 'Payment Management / Driver Online / Add',
-        meta: {
-          title: 'Driver Online Add',
-        },
-      },
-      {
-        path: '/payment-management/driver/:id',
-        component: DriverOperation,
-        name: 'Payment Management / Driver Online / Edit',
-        meta: {
-          title: 'Driver Online Edit',
         },
       },
     ],

@@ -18,23 +18,6 @@
                   <b-col>
                     <b-card class="shadow-form">
                       <ValidationProvider
-                        name="outlet"
-                        :rules="{ required: true }"
-                        v-slot="validationContext"
-                      >
-                        <b-form-group label="Outlet*">
-                          <b-form-select
-                            :state="getValidationState(validationContext)"
-                            :options="optionsCompany"
-                          >
-                          </b-form-select>
-                          <b-form-invalid-feedback id="input-1-live-feedback">{{
-                            validationContext.errors[0]
-                          }}</b-form-invalid-feedback>
-                        </b-form-group>
-                      </ValidationProvider>
-
-                      <ValidationProvider
                         name="department"
                         :rules="{ required: true }"
                         v-slot="validationContext"
@@ -61,6 +44,23 @@
                             :state="getValidationState(validationContext)"
                           >
                           </b-form-input>
+                          <b-form-invalid-feedback id="input-1-live-feedback">{{
+                            validationContext.errors[0]
+                          }}</b-form-invalid-feedback>
+                        </b-form-group>
+                      </ValidationProvider>
+                      <ValidationProvider
+                        name="outlet"
+                        :rules="{ required: true }"
+                        v-slot="validationContext"
+                      >
+                        <b-form-group label="Outlet*">
+                          <b-form-checkbox-group
+                            :state="getValidationState(validationContext)"
+                            :options="optionsOutlet"
+                            stacked
+                          >
+                          </b-form-checkbox-group>
                           <b-form-invalid-feedback id="input-1-live-feedback">{{
                             validationContext.errors[0]
                           }}</b-form-invalid-feedback>

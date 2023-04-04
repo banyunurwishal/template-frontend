@@ -139,6 +139,31 @@
                           </ValidationProvider>
                         </b-col>
                       </b-row>
+                      <hr />
+                      <b-row>
+                        <b-col>
+                          <ValidationProvider
+                            name="outlet"
+                            :rules="{ required: true }"
+                            v-slot="validationContext"
+                          >
+                            <b-form-group label="Outlet*">
+                              <b-form-checkbox-group
+                                :state="getValidationState(validationContext)"
+                                :options="optionsOutlet"
+                                stacked
+                              >
+                              </b-form-checkbox-group>
+                              <b-form-invalid-feedback
+                                id="input-1-live-feedback"
+                                >{{
+                                  validationContext.errors[0]
+                                }}</b-form-invalid-feedback
+                              >
+                            </b-form-group>
+                          </ValidationProvider>
+                        </b-col>
+                      </b-row>
                     </div>
 
                     <div class="text-right">
@@ -183,6 +208,15 @@ export default {
         { value: null, text: 'Please select an option' },
         { value: 'slc', text: 'Slice' },
         { value: 'scoop', text: 'Scoop' },
+      ],
+      optionsOutlet: [
+        { value: null, text: 'Please select an option' },
+        { value: 'kop', text: 'Kopi Kenangan Buah Batu' },
+        { value: 'kop', text: 'Kopi Toko Djawa Buah Batu' },
+        { value: 'kak', text: 'Kopi Janji Jiwa Buah Batu' },
+        { value: 'kop', text: 'Kopi Kenangan Bandung' },
+        { value: 'kop', text: 'Kopi Toko Djawa Bandung' },
+        { value: 'kak', text: 'Kopi Janji Jiwa Bandung' },
       ],
     }
   },

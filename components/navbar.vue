@@ -148,16 +148,6 @@
                     $t('sidebar.bank')
                   }}</a>
                 </li>
-                <li class="pointer" @click="handleCompliment">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.compliment')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handleDriver">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.driver')
-                  }}</a>
-                </li>
               </ul>
             </li>
             <li class="nav-item dropdown">
@@ -274,14 +264,6 @@ export default {
       this.$router.push('/store-management/departments')
     },
 
-    // table
-    handleSection() {
-      this.$router.push('/table-management/section')
-    },
-    handleTable() {
-      this.$router.push('/table-management/table')
-    },
-
     // product
     handleCategory() {
       this.$router.push('/product-management/product-category')
@@ -295,24 +277,9 @@ export default {
     handlePackage() {
       this.$router.push('/product-management/product-package')
     },
-
     // payment
     handleBank() {
       this.$router.push('/payment-management/payment')
-    },
-    handleCompliment() {
-      this.$router.push('/payment-management/compliment')
-    },
-    handleDriver() {
-      this.$router.push('/payment-management/driver')
-    },
-
-    // promo
-    handlePromo() {
-      this.$router.push('/promo-management/disc-promo')
-    },
-    handleDynamicPromo() {
-      this.$router.push('/promo-management/disc-dynamic-promo')
     },
 
     handleLogout() {
