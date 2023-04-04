@@ -1,0 +1,11 @@
+.git
+node_modules
+.eslit*
+.prettier*
+.gitignore
+.gitattributes
+.husky
+Dockerfile
+.dockerignore
+docker-compose.yaml
+README.md
