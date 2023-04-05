@@ -9,7 +9,13 @@
           <b-col>
             <b-row>
               <b-col>
-                <h4>Create New Department</h4>
+                <h4>
+                  {{
+                    this.$route.params.id
+                      ? 'Edit New Department'
+                      : 'Create New Department'
+                  }}
+                </h4>
               </b-col>
             </b-row>
             <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
@@ -24,6 +30,7 @@
                       >
                         <b-form-group label="Department Name*">
                           <b-form-input
+                            v-model="formModel.department_name"
                             :state="getValidationState(validationContext)"
                           >
                           </b-form-input>
@@ -38,12 +45,13 @@
                         v-slot="validationContext"
                       >
                         <b-form-group label="Outlet*">
-                          <b-form-checkbox-group
+                          <b-form-select
+                            v-model="formModel.id_outlet"
                             :state="getValidationState(validationContext)"
-                            :options="optionsOutlet"
+                            :options="listOutlet"
                             stacked
                           >
-                          </b-form-checkbox-group>
+                          </b-form-select>
                           <b-form-invalid-feedback id="input-1-live-feedback">{{
                             validationContext.errors[0]
                           }}</b-form-invalid-feedback>
@@ -83,6 +91,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 
 export default {
@@ -93,10 +102,16 @@ export default {
   name: 'IndexPage',
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchListOutlet()
+    if (this.$route.params.id) {
+      console.log(this.$route.params.id)
+      await this.handleEditModel()
+    }
     this.$processLoading.HIDE({})
   },
   data() {
     return {
+      formModel: {},
       optionsCompany: [
         { value: null, text: 'Please select an option' },
         { value: 'q', text: 'Kopi Kenangan' },
@@ -110,26 +125,81 @@ export default {
         { value: 'pp', text: 'Sales' },
         { value: 'pp', text: 'Kasir' },
       ],
-      optionsOutlet: [
-        { value: 'kop', text: 'Kopi Kenangan Buah Batu' },
-        { value: 'kop', text: 'Kopi Toko Djawa Buah Batu' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Buah Batu' },
-        { value: 'kop', text: 'Kopi Kenangan Bandung' },
-        { value: 'kop', text: 'Kopi Toko Djawa Bandung' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Bandung' },
-      ],
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      listOutlet: (state) => {
+        let data = []
+        state.options.listOutlet.forEach((item) => {
+          data.push({
+            text: item.outlet_name,
+            value: item.id_outlet,
+          })
+        })
+        return data
+      },
+      editedModel: (state) => state.department.model,
+    }),
+  },
   methods: {
+    ...mapActions('department', [
+      'fetchLists',
+      'createModel',
+      'fetchModel',
+      'updateModel',
+    ]),
+    ...mapActions('options', ['fetchListOutlet']),
+
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
+    },
+
+    async handleEditModel() {
+      let id = await this.$route.params.id
+      await this.fetchModel(id)
+      console.log(this.editedModel)
+      if (this.editedModel) {
+        let dataContainer = {}
+        Object.assign(dataContainer, this.editedModel)
+        this.formModel = dataContainer
+      }
     },
 
     handleCancelBtn() {
       this.$router.push('/store-management/departments')
     },
-    async onSubmit() {},
+
+    async onSubmit() {
+      this.$processLoading.SHOW({})
+      if (this.editedModel) {
+        await this.updateModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      } else {
+        await this.createModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      }
+    },
   },
 }
 </script>

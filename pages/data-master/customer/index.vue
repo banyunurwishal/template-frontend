@@ -1,44 +1,36 @@
 <template>
-  <div id="department" class="">
+  <div id="section">
     <section
       class="section mt-5"
       style="padding-left: 2rem !important; padding-right: 2rem !important"
     >
       <div class="section-body">
-        <b-row class="px-3">
-          <b-col>
-            <div>
-              <h4>Departments</h4>
-            </div>
+        <b-row>
+          <b-col cols="10">
+            <h4>Customer</h4>
           </b-col>
-          <b-col class="text-right">
-            <b-button
-              size="md"
-              class="rounded-8 px-4"
-              variant="primary"
-              @click="handleAdd"
+          <b-col cols="2" class="text-right">
+            <!-- <a
+              class="btn btn-primary text-white ml-auto bg-primary-q"
+              @click="handleAdd()"
             >
-              <font-awesome-icon
-                :icon="['fas', 'plus']"
-                style="font-size: 14px"
-              />
-              Add New Departments
-            </b-button>
+              <i class="fas fa-plus" style="font-size: 12px"> </i> Add Customer
+            </a> -->
           </b-col>
         </b-row>
         <b-row class="px-3 mt-3">
           <b-col>
             <b-table
-              :items="listDepartment"
+              :items="items"
               :per-page="perPage"
               :current-page="currentPage"
-              :fields="fields"
               responsive
               hover
               striped
               class="table-header shadow-table"
+              :fields="header"
             >
-              <template #cell(actions)="data">
+              <template #cell(actions)="row" class="text-right">
                 <b-dropdown
                   variant="link"
                   toggle-class="text-decoration-none"
@@ -48,10 +40,10 @@
                   <template #button-content>
                     <dots />
                   </template>
-                  <b-dropdown-item @click="handleEdit(data.item)">
+                  <b-dropdown-item @click="handleEdit(row.item)">
                     Edit
                   </b-dropdown-item>
-                  <b-dropdown-item @click="handleDelete(data.item)">
+                  <b-dropdown-item @click="handleDelete(row.item)">
                     Delete
                   </b-dropdown-item>
                 </b-dropdown>
@@ -74,59 +66,78 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
 
 export default {
-  name: 'IndexPage',
+  name: 'supplier',
   components: { dots, plus },
   async created() {
     this.$processLoading.SHOW({})
-    await this.fetchLists()
+    this.$processLoading.HIDE({})
+  },
+  async created() {
+    this.$processLoading.SHOW({})
     this.$processLoading.HIDE({})
   },
   data() {
     return {
+      perPage: 10,
       currentPage: 1,
-      perPage: 5,
-      fields: [
+      header: [
         {
-          key: 'outlet.outlet_name',
-          label: 'Outlet Name',
+          key: 'name',
+          label: 'Name',
         },
         {
-          key: 'department_name',
-          label: 'Department Name',
+          key: 'address',
+          label: 'Adress',
+        },
+        {
+          key: 'phone',
+          label: 'Phone',
+        },
+        {
+          key: 'pic',
+          label: 'Person In Change',
         },
         {
           key: 'actions',
           label: 'Actions',
         },
       ],
+      items: [
+        {
+          id: 1,
+          name: 'gudang',
+          address: 'Bandung',
+          phone: '0826276729',
+          pic: 'Ayah',
+        },
+        {
+          id: 1,
+          name: 'Makmur Bahagia',
+          address: 'Jakarta',
+          phone: '0821111119',
+          pic: 'Ibu',
+        },
+      ],
     }
   },
-  computed: {
-    ...mapState({
-      listDepartment: (state) => state.department.lists,
-    }),
-  },
+  computed: {},
   methods: {
-    ...mapActions('department', ['fetchLists', 'deleteModel']),
-    ...mapActions('options', ['fetchListOutlet']),
     handleAdd() {
-      this.$router.push('/store-management/departments/add')
+      this.$router.push('/master-data/supplier/add')
     },
-
     handleEdit(data) {
-      this.$router.push('/store-management/departments/' + data.id_department)
+      this.$router.push('/master-data/supplier/' + data.id)
     },
 
     async handleDelete(data) {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.id_department)
+          await this.deleteModel(data.uuid)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')
@@ -143,3 +154,8 @@ export default {
   },
 }
 </script>
+<style>
+.table-header .table:not(.table-sm) thead th {
+  background-color: #fff !important;
+}
+</style>

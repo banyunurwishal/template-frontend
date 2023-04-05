@@ -157,9 +157,14 @@
                 }}</span></a
               >
               <ul class="dropdown-menu bg-primary">
-                <li class="pointer" @click="handleUnit">
+                <li class="pointer" @click="handleCustomer">
                   <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.unit')
+                    $t('sidebar.customer')
+                  }}</a>
+                </li>
+                <li class="pointer" @click="handleMdl">
+                  <a class="nav-link nav-hover bg-primary text-white">{{
+                    $t('sidebar.mdl')
                   }}</a>
                 </li>
                 <li class="pointer" @click="handleMaterial">
@@ -172,9 +177,9 @@
                     $t('sidebar.supplier')
                   }}</a>
                 </li>
-                <li class="pointer" @click="handleMdl">
+                <li class="pointer" @click="handleUnit">
                   <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.mdl')
+                    $t('sidebar.unit')
                   }}</a>
                 </li>
               </ul>
@@ -251,6 +256,9 @@ export default {
     },
     handleMdl() {
       this.$router.push('/master-data/mdl')
+    },
+    handleCustomer() {
+      this.$router.push('/master-data/customer')
     },
 
     // store

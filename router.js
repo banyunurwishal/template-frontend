@@ -12,6 +12,7 @@ import Supplier from './pages/data-master/supplier'
 import SupplierActions from './pages/data-master/supplier/edit.vue'
 import Mdl from './pages/data-master/mdl'
 import MdlActions from './pages/data-master/mdl/edit.vue'
+import Customer from './pages/data-master/customer'
 
 import Outlet from './pages/store-management/outlet'
 import Company from './pages/store-management/company'
@@ -147,6 +148,14 @@ export function createRouter() {
         name: 'Master Data / MDL / Edit',
         meta: {
           title: 'Edit MDL',
+        },
+      },
+      {
+        path: '/master-data/customer',
+        component: Customer,
+        name: 'Master Data / Customer',
+        meta: {
+          title: 'Customer',
         },
       },
 

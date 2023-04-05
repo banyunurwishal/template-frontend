@@ -25,6 +25,7 @@ export default {
     unit: 'Unit',
     material: 'Material',
     supplier: 'Supplier',
+    customer: 'Customer',
     mdl: 'Master Data Listing',
     dataMaster: 'Data Master',
   },
