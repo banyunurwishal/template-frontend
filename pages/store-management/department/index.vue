@@ -38,6 +38,18 @@
               striped
               class="table-header shadow-table"
             >
+              <template #cell(outlet)="data">
+                <span
+                  v-for="(item, index) in data.item.department_has_outlets"
+                  :key="index"
+                >
+                  {{
+                    index > 0
+                      ? ', ' + item.outlets.outlet_name
+                      : item.outlets.outlet_name
+                  }}
+                </span>
+              </template>
               <template #cell(actions)="data">
                 <b-dropdown
                   variant="link"
@@ -92,7 +104,7 @@ export default {
       perPage: 5,
       fields: [
         {
-          key: 'outlet.outlet_name',
+          key: 'outlet',
           label: 'Outlet Name',
         },
         {
@@ -113,7 +125,6 @@ export default {
   },
   methods: {
     ...mapActions('department', ['fetchLists', 'deleteModel']),
-    ...mapActions('options', ['fetchListOutlet']),
     handleAdd() {
       this.$router.push('/store-management/departments/add')
     },

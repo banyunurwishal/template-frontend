@@ -31,7 +31,7 @@ export default {
 
   async updateModel({ commit, state }, payload) {
     if (payload) {
-      return await this.$axios.put('/department/' + payload.uuid, payload)
+      return await this.$axios.put('/department/' + payload.id, payload)
     }
   },
 

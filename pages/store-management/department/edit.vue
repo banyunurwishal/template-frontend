@@ -44,18 +44,10 @@
                         :rules="{ required: true }"
                         v-slot="validationContext"
                       >
-                        <b-form-group label="Outlet*">
-                          <b-form-select
-                            v-model="formModel.id_outlet"
-                            :state="getValidationState(validationContext)"
-                            :options="listOutlet"
-                            stacked
-                          >
-                          </b-form-select>
-                          <b-form-invalid-feedback id="input-1-live-feedback">{{
-                            validationContext.errors[0]
-                          }}</b-form-invalid-feedback>
-                        </b-form-group>
+                        <SelectOutlet
+                          :state="getValidationState(validationContext)"
+                          v-model="formModel.id_outlet"
+                        />
                       </ValidationProvider>
                     </b-card>
                   </b-col>
@@ -93,11 +85,13 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
 
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
+    SelectOutlet,
   },
   name: 'IndexPage',
   async created() {
@@ -158,7 +152,6 @@ export default {
     async handleEditModel() {
       let id = await this.$route.params.id
       await this.fetchModel(id)
-      console.log(this.editedModel)
       if (this.editedModel) {
         let dataContainer = {}
         Object.assign(dataContainer, this.editedModel)
