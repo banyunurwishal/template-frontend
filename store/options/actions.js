@@ -30,4 +30,33 @@ export default {
       }
     })
   },
+
+  async fetchListDepartment({ commit, state }, params) {
+    await this.$axios.get('department', { params }).then((res) => {
+      if (res.data && res.data) {
+        commit('SET_DEPARTMENT', res.data.data)
+      }
+    })
+  },
+  async fetchListMaterials({ commit, state }, params) {
+    await this.$axios.get('materials', { params }).then((res) => {
+      if (res.data && res.data) {
+        commit('SET_MATERIALS', res.data.data)
+      }
+    })
+  },
+  async fetchListProductCategory({ commit, state }, params) {
+    await this.$axios.get('product-category', { params }).then((res) => {
+      if (res.data && res.data) {
+        commit('SET_PRODUCT_CATEGORY', res.data.data)
+      }
+    })
+  },
+  async fetchListSideDish({ commit, state }, params) {
+    await this.$axios.get('side-dish', { params }).then((res) => {
+      if (res.data && res.data) {
+        commit('SET_SIDE_DISH', res.data.data)
+      }
+    })
+  },
 }
