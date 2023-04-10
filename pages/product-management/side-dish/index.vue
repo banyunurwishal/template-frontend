@@ -26,15 +26,10 @@
             </b-button>
           </b-col>
         </b-row>
-        <b-row class="mt-3 px-3" align-h="end">
-          <b-col sm="3">
-            <b-form-input placeholder="Search"></b-form-input>
-          </b-col>
-        </b-row>
         <b-row class="px-3 mt-3">
           <b-col>
             <b-table
-              :items="items"
+              :items="listSideDish"
               :per-page="perPage"
               :current-page="currentPage"
               :fields="fields"
@@ -43,6 +38,18 @@
               striped
               class="table-header shadow-table"
             >
+              <template #cell(outlet)="data">
+                <span
+                  v-for="(item, index) in data.item.sidedish_has_outlets"
+                  :key="index"
+                >
+                  {{
+                    index > 0
+                      ? ', ' + item.outlets.outlet_name
+                      : item.outlets.outlet_name
+                  }}
+                </span>
+              </template>
               <template #cell(actions)="data">
                 <b-dropdown
                   variant="link"
@@ -53,8 +60,12 @@
                   <template #button-content>
                     <dots />
                   </template>
-                  <b-dropdown-item> Edit </b-dropdown-item>
-                  <b-dropdown-item> Delete </b-dropdown-item>
+                  <b-dropdown-item @click="handleEdit(data.item)">
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="handleDelete(data.item)">
+                    Delete
+                  </b-dropdown-item>
                 </b-dropdown>
               </template>
             </b-table>
@@ -75,6 +86,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
 
@@ -83,35 +95,28 @@ export default {
   components: { dots, plus },
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchLists()
     this.$processLoading.HIDE({})
   },
   data() {
     return {
       currentPage: 1,
       perPage: 5,
-      items: [
-        {
-          outlet_name: 'name',
-          department: 'name',
-          side_dish: 'name',
-          price: 'name',
-        },
-      ],
       fields: [
         {
-          key: 'outlet_name',
+          key: 'outlet',
           label: 'Outlet Name',
         },
         {
-          key: 'department',
+          key: 'department.department_name',
           label: 'Department',
         },
         {
-          key: 'side_dish',
+          key: 'sidedish_name',
           label: 'Side Dish',
         },
         {
-          key: 'price',
+          key: 'sidedish_price',
           label: 'Price',
         },
         {
@@ -121,20 +126,25 @@ export default {
       ],
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      listSideDish: (state) => state.sideDish.lists,
+    }),
+  },
   methods: {
+    ...mapActions('sideDish', ['fetchLists', 'deleteModel']),
     handleAdd() {
       this.$router.push('/product-management/side-dish/add')
     },
     handleEdit(data) {
-      this.$router.push('/product-management/side-dish/' + data.id)
+      this.$router.push('/product-management/side-dish/' + data.id_sidedish)
     },
 
     async handleDelete(data) {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.uuid)
+          await this.deleteModel(data.id_sidedish)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')
