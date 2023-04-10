@@ -6,7 +6,9 @@
           <template #label> Outlet*<br /> </template>
 
           <template>
-            <div class="border border-primary rounded-top p-3 mt-2">
+            <div
+              class="border border-primary rounded-top p-3 mt-2 border-primary"
+            >
               <b-form-checkbox
                 v-model="allSelected"
                 :indeterminate="indeterminate"
@@ -15,7 +17,7 @@
                 Select All
               </b-form-checkbox>
             </div>
-            <div class="border border-top-0 rounded-bottom border-primary p-3">
+            <div class="border border-top-0 rounded-bottom p-3 border-primary">
               <b-form-input
                 v-model="search"
                 class="rounded-10 border"
@@ -27,11 +29,22 @@
                 style="position: relative; overflow-y: auto; height: 200px"
               >
                 <b-form-checkbox-group
+                  v-model="hasData"
+                  :options="listOutlet"
+                  class="ml-3"
+                  :state="state"
+                  stacked
+                  v-if="hasData"
+                  @input="$emit('input', $event)"
+                  @change="$emit('change', $event)"
+                ></b-form-checkbox-group>
+                <b-form-checkbox-group
                   v-model="selected"
                   :options="listOutlet"
                   class="ml-3"
                   :state="state"
                   stacked
+                  v-else
                   @input="$emit('input', $event)"
                   @change="$emit('change', $event)"
                 ></b-form-checkbox-group>
@@ -68,6 +81,7 @@ export default {
   },
   props: {
     state: null,
+    hasData: [],
   },
   computed: {
     ...mapState({
@@ -88,6 +102,7 @@ export default {
       })
     },
   },
+  mounted() {},
   methods: {
     ...mapActions('options', ['fetchListOutlet']),
     getValidationState({ dirty, validated, valid = null }) {
@@ -98,7 +113,15 @@ export default {
         this.listOutlet.forEach((e) => {
           this.selected.push(e.value)
         })
+        if (this.hasData) {
+          this.listOutlet.forEach((e) => {
+            this.hasData.push(e.value)
+          })
+        }
       } else {
+        if (this.hasData) {
+          this.hasData = []
+        }
         this.selected = []
       }
     },
