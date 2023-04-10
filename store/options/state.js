@@ -3,4 +3,8 @@ export default () => ({
   listUnit: [],
   listSupplier: [],
   listMaterial: [],
+  listDepartment: [],
+  listMaterials: [],
+  listProductCategory: [],
+  listSideDish: [],
 })

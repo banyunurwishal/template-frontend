@@ -9,7 +9,13 @@
           <b-col>
             <b-row>
               <b-col>
-                <h4>Create New Product Category</h4>
+                <h4>
+                  {{
+                    this.$route.params.id
+                      ? 'Edit New Product Category'
+                      : 'Create New Product Category'
+                  }}
+                </h4>
               </b-col>
             </b-row>
             <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
@@ -25,7 +31,8 @@
                         <b-form-group label="Department*">
                           <b-form-select
                             :state="getValidationState(validationContext)"
-                            :options="optionsDepartement"
+                            v-model="formModel.id_department"
+                            :options="listDepartment"
                           >
                           </b-form-select>
                           <b-form-invalid-feedback id="input-1-live-feedback">{{
@@ -42,6 +49,7 @@
                         <b-form-group label="Category Name*">
                           <b-form-input
                             :state="getValidationState(validationContext)"
+                            v-model="formModel.category_name"
                           >
                           </b-form-input>
                           <b-form-invalid-feedback id="input-1-live-feedback">{{
@@ -54,17 +62,10 @@
                         :rules="{ required: true }"
                         v-slot="validationContext"
                       >
-                        <b-form-group label="Outlet*">
-                          <b-form-checkbox-group
-                            :state="getValidationState(validationContext)"
-                            :options="optionsOutlet"
-                            stacked
-                          >
-                          </b-form-checkbox-group>
-                          <b-form-invalid-feedback id="input-1-live-feedback">{{
-                            validationContext.errors[0]
-                          }}</b-form-invalid-feedback>
-                        </b-form-group>
+                        <SelectOutlet
+                          :state="getValidationState(validationContext)"
+                          v-model="formModel.id_outlet"
+                        />
                       </ValidationProvider>
                     </b-card>
                   </b-col>
@@ -100,54 +101,102 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
 
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
+    SelectOutlet,
   },
   name: 'IndexPage',
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchListDepartment()
+    if (this.$route.params.id) {
+      await this.handleEditModel()
+    }
     this.$processLoading.HIDE({})
   },
   data() {
     return {
-      optionsCompany: [
-        { value: null, text: 'Please select an option' },
-        { value: 'q', text: 'Kopi Kenangan' },
-        { value: 'kak', text: 'Kopi Toko Djawa' },
-        { value: 'kak', text: 'Kopi Janji Jiwa' },
-      ],
-      optionsDepartement: [
-        { value: null, text: 'Please select an option' },
-        { value: 'q', text: 'Marketing' },
-        { value: 'gudang', text: 'Gudang' },
-        { value: 'pp', text: 'Sales' },
-        { value: 'pp', text: 'Kasir' },
-      ],
-      optionsOutlet: [
-        { value: null, text: 'Please select an option' },
-        { value: 'kop', text: 'Kopi Kenangan Buah Batu' },
-        { value: 'kop', text: 'Kopi Toko Djawa Buah Batu' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Buah Batu' },
-        { value: 'kop', text: 'Kopi Kenangan Bandung' },
-        { value: 'kop', text: 'Kopi Toko Djawa Bandung' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Bandung' },
-      ],
+      formModel: {},
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      editedModel: (state) => state.productCategory.model,
+      listDepartment: (state) => {
+        let data = []
+        state.options.listDepartment.forEach((item) => {
+          data.push({
+            text: item.department_name,
+            value: item.id_department,
+          })
+        })
+        return data
+      },
+    }),
+  },
   methods: {
+    ...mapActions('productCategory', [
+      'fetchLists',
+      'createModel',
+      'fetchModel',
+      'updateModel',
+    ]),
+    ...mapActions('options', ['fetchListDepartment']),
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
     },
 
     handleCancelBtn() {
-      this.$router.push('/table-management/section')
+      this.$router.push('/product-management/product-category')
     },
-    async onSubmit() {},
+
+    async handleEditModel() {
+      let id = await this.$route.params.id
+      await this.fetchModel(id)
+      console.log(this.editedModel)
+      if (this.editedModel) {
+        let dataContainer = {}
+        Object.assign(dataContainer, this.editedModel)
+        this.formModel = dataContainer
+      }
+    },
+
+    async onSubmit() {
+      this.$processLoading.SHOW({})
+      if (this.editedModel) {
+        await this.updateModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      } else {
+        await this.createModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      }
+    },
   },
 }
 </script>

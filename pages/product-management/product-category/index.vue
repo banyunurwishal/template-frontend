@@ -26,29 +26,10 @@
             </b-button>
           </b-col>
         </b-row>
-        <b-row class="px-3 mt-4">
-          <b-col>
-            <b-row>
-              <b-col>
-                <b-form-select placeholder="All Outlet"></b-form-select>
-              </b-col>
-              <b-col>
-                <b-form-select placeholder="All Department"></b-form-select>
-              </b-col>
-            </b-row>
-          </b-col>
-          <b-col>
-            <b-row align-h="end">
-              <b-col sm="6">
-                <b-form-input placeholder="Search"></b-form-input>
-              </b-col>
-            </b-row>
-          </b-col>
-        </b-row>
         <b-row class="px-3 mt-3">
           <b-col>
             <b-table
-              :items="items"
+              :items="listProductCategory"
               :per-page="perPage"
               :current-page="currentPage"
               :fields="fields"
@@ -67,8 +48,12 @@
                   <template #button-content>
                     <dots />
                   </template>
-                  <b-dropdown-item> Edit </b-dropdown-item>
-                  <b-dropdown-item> Delete </b-dropdown-item>
+                  <b-dropdown-item @click="handleEdit(data.item)">
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="handleDelete(data.item)">
+                    Delete
+                  </b-dropdown-item>
                 </b-dropdown>
               </template>
             </b-table>
@@ -89,6 +74,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
 
@@ -97,6 +83,7 @@ export default {
   components: { dots, plus },
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchLists()
     this.$processLoading.HIDE({})
   },
   data() {
@@ -112,11 +99,11 @@ export default {
       ],
       fields: [
         {
-          key: 'outlet_name',
+          key: 'outlet.outlet_name',
           label: 'Outlet Name',
         },
         {
-          key: 'department',
+          key: 'department.department_name',
           label: 'Department',
         },
         {
@@ -130,20 +117,27 @@ export default {
       ],
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      listProductCategory: (state) => state.productCategory.lists,
+    }),
+  },
   methods: {
+    ...mapActions('productCategory', ['fetchLists', 'deleteModel']),
     handleAdd() {
       this.$router.push('/product-management/product-category/add')
     },
     handleEdit(data) {
-      this.$router.push('/product-management/product-category/' + data.id)
+      this.$router.push(
+        '/product-management/product-category/' + data.id_product_category
+      )
     },
 
     async handleDelete(data) {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.uuid)
+          await this.deleteModel(data.id_product_category)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')

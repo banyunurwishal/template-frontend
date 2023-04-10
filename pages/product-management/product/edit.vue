@@ -9,7 +9,13 @@
           <b-col>
             <b-row>
               <b-col>
-                <h4>Create New Product</h4>
+                <h4>
+                  {{
+                    this.$route.params.id
+                      ? 'Edit New Product'
+                      : 'Create New Product'
+                  }}
+                </h4>
               </b-col>
             </b-row>
             <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
@@ -27,7 +33,8 @@
                             <b-form-group label="Department*">
                               <b-form-select
                                 :state="getValidationState(validationContext)"
-                                :options="optionsDepartement"
+                                :options="listDepartment"
+                                v-model="formModel.id_department"
                               >
                               </b-form-select>
                               <b-form-invalid-feedback
@@ -45,8 +52,30 @@
                             v-slot="validationContext"
                           >
                             <b-form-group label="Category*">
+                              <b-form-select
+                                :state="getValidationState(validationContext)"
+                                :options="listProductCategory"
+                                v-model="formModel.id_product_category"
+                              >
+                              </b-form-select>
+                              <b-form-invalid-feedback
+                                id="input-1-live-feedback"
+                                >{{
+                                  validationContext.errors[0]
+                                }}</b-form-invalid-feedback
+                              >
+                            </b-form-group>
+                          </ValidationProvider>
+
+                          <ValidationProvider
+                            name="product_name"
+                            :rules="{ required: true }"
+                            v-slot="validationContext"
+                          >
+                            <b-form-group label="Product Name*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.product_name"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -65,7 +94,9 @@
                           >
                             <b-form-group label="Price*">
                               <b-form-input
+                                number
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.product_price"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -84,7 +115,9 @@
                           >
                             <b-form-group label="Cost of Good Sold*">
                               <b-form-input
+                                number
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.product_cogs"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -103,7 +136,9 @@
                           >
                             <b-form-group label="Tax %*">
                               <b-form-input
+                                number
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.ppn"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -122,7 +157,9 @@
                           >
                             <b-form-group label="Service*">
                               <b-form-input
+                                number
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.service"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -142,6 +179,7 @@
                             <b-form-group label="Product Code*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.code"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -153,6 +191,9 @@
                             </b-form-group>
                           </ValidationProvider>
 
+                          <b-form-input v-model="formModel.status" hidden>
+                          </b-form-input>
+
                           <ValidationProvider
                             name="product_image"
                             :rules="{ required: true }"
@@ -161,6 +202,7 @@
                             <b-form-group label="Product Image*">
                               <b-form-file
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.image"
                               >
                               </b-form-file>
                               <b-form-invalid-feedback
@@ -176,20 +218,11 @@
                             :rules="{ required: true }"
                             v-slot="validationContext"
                           >
-                            <b-form-group label="Outlet*">
-                              <b-form-checkbox-group
-                                :state="getValidationState(validationContext)"
-                                :options="optionsOutlet"
-                                stacked
-                              >
-                              </b-form-checkbox-group>
-                              <b-form-invalid-feedback
-                                id="input-1-live-feedback"
-                                >{{
-                                  validationContext.errors[0]
-                                }}</b-form-invalid-feedback
-                              >
-                            </b-form-group>
+                            <SelectOutlet
+                              :state="getValidationState(validationContext)"
+                              v-model="formModel.id_outlet"
+                              :hasData="childOutlet"
+                            />
                           </ValidationProvider>
                         </b-tab>
                         <b-tab title="Side Dish">
@@ -202,7 +235,7 @@
                             </b-button>
                           </div>
                           <div
-                            v-for="(item, index) in formModel.sideDish"
+                            v-for="(item, index) in formModel.product_sidedish"
                             :key="index"
                           >
                             <div
@@ -212,7 +245,10 @@
                               <b-row>
                                 <b-col>
                                   <label for="">Side dish</label>
-                                  <b-form-select v-model="item.sidedish">
+                                  <b-form-select
+                                    :options="listSideDish"
+                                    v-model="item.id_sidedish"
+                                  >
                                   </b-form-select>
                                 </b-col>
                                 <b-col class="text-right" align-self="start">
@@ -220,7 +256,7 @@
                                     variant="danger"
                                     @click="handleDeleteItemSideDish(index)"
                                     :class="
-                                      formModel.sideDish.length > 1
+                                      formModel.product_sidedish.length > 1
                                         ? ''
                                         : 'invisible'
                                     "
@@ -241,7 +277,9 @@
                             </b-button>
                           </div>
                           <div
-                            v-for="(item, index) in formModel.ingredient"
+                            v-for="(
+                              item, index
+                            ) in formModel.product_ingredient"
                             :key="index"
                           >
                             <div
@@ -251,11 +289,17 @@
                               <b-row>
                                 <b-col>
                                   <b-form-group label="Ingredient">
-                                    <b-form-select v-model="item.ingredient">
+                                    <b-form-select
+                                      :options="listMaterials"
+                                      v-model="item.id_material"
+                                    >
                                     </b-form-select>
                                   </b-form-group>
                                   <b-form-group label="Quantity">
-                                    <b-form-input v-model="item.quantity">
+                                    <b-form-input
+                                      number
+                                      v-model="item.quantity"
+                                    >
                                     </b-form-input>
                                   </b-form-group>
                                 </b-col>
@@ -264,7 +308,7 @@
                                     variant="danger"
                                     @click="handleDeleteItem(index)"
                                     :class="
-                                      formModel.ingredient.length > 1
+                                      formModel.product_ingredient.length > 1
                                         ? ''
                                         : 'invisible'
                                     "
@@ -313,88 +357,206 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
 
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
+    SelectOutlet,
   },
   name: 'IndexPage',
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchListDepartment()
+    await this.fetchListMaterials()
+    await this.fetchListProductCategory()
+    await this.fetchListSideDish()
+    if (this.$route.params.id) {
+      await this.handleEditModel()
+    }
     this.$processLoading.HIDE({})
   },
   data() {
     return {
+      childOutlet: [],
       formModel: {
-        ingredient: [
+        product_ingredient: [
           {
-            ingredient: '',
-            quantity: '',
+            id_material: '',
+            quantity: null,
           },
         ],
-        sideDish: [
+        product_sidedish: [
           {
-            sidedish: '',
+            id_sidedish: '',
           },
         ],
       },
-      optionsCompany: [
-        { value: null, text: 'Please select an option' },
-        { value: 'q', text: 'Kopi Kenangan' },
-        { value: 'kak', text: 'Kopi Toko Djawa' },
-        { value: 'kak', text: 'Kopi Janji Jiwa' },
-      ],
-      optionsDepartement: [
-        { value: null, text: 'Please select an option' },
-        { value: 'q', text: 'Marketing' },
-        { value: 'gudang', text: 'Gudang' },
-        { value: 'pp', text: 'Sales' },
-        { value: 'pp', text: 'Kasir' },
-      ],
-      optionsOutlet: [
-        { value: null, text: 'Please select an option' },
-        { value: 'kop', text: 'Kopi Kenangan Buah Batu' },
-        { value: 'kop', text: 'Kopi Toko Djawa Buah Batu' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Buah Batu' },
-        { value: 'kop', text: 'Kopi Kenangan Bandung' },
-        { value: 'kop', text: 'Kopi Toko Djawa Bandung' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Bandung' },
-      ],
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      editedModel: (state) => state.product.model,
+      listDepartment: (state) => {
+        let data = []
+        state.options.listDepartment.forEach((item) => {
+          data.push({
+            text: item.department_name,
+            value: item.id_department,
+          })
+        })
+        return data
+      },
+      listMaterials: (state) => {
+        let data = []
+        state.options.listMaterials.forEach((item) => {
+          data.push({
+            text: item.name,
+            value: item.id,
+            unit: item.unit,
+          })
+        })
+        return data
+      },
+      listProductCategory: (state) => {
+        let data = []
+        state.options.listProductCategory.forEach((item) => {
+          data.push({
+            text: item.category_name,
+            value: item.id_product_category,
+          })
+        })
+        return data
+      },
+      listSideDish: (state) => {
+        let data = []
+        state.options.listSideDish.forEach((item) => {
+          data.push({
+            text: item.sidedish_name,
+            value: item.id_sidedish,
+          })
+        })
+        return data
+      },
+    }),
+  },
   methods: {
+    ...mapActions('product', [
+      'fetchLists',
+      'createModel',
+      'fetchModel',
+      'updateModel',
+    ]),
+    ...mapActions('options', [
+      'fetchListDepartment',
+      'fetchListMaterials',
+      'fetchListProductCategory',
+      'fetchListSideDish',
+    ]),
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
     },
 
     handleItem() {
-      this.formModel.ingredient.push({
-        ingredient: '',
-        quantity: '',
+      this.formModel.product_ingredient.push({
+        id_material: '',
+        quantity: null,
       })
     },
 
     handleItemSideDish() {
-      this.formModel.sideDish.push({
-        sidedish: '',
+      this.formModel.product_sidedish.push({
+        id_sidedish: '',
       })
     },
 
     handleDeleteItem(index) {
-      this.formModel.ingredient.splice(index, 1)
+      this.formModel.product_ingredient.splice(index, 1)
     },
 
     handleDeleteItemSideDish(index) {
-      this.formModel.sideDish.splice(index, 1)
+      this.formModel.product_sidedish.splice(index, 1)
     },
 
     handleCancelBtn() {
       this.$router.push('/product-management/product')
     },
-    async onSubmit() {},
+
+    async handleEditModel() {
+      let id = await this.$route.params.id
+      await this.fetchModel(id)
+      if (this.editedModel) {
+        let dataContainer = {}
+        let outlet = []
+        let ingred = []
+        let sideDis = []
+        Object.assign(dataContainer, this.editedModel)
+        dataContainer.product_has_outlets.forEach((item) => {
+          outlet.push(item.outlets.id_outlet)
+        })
+        dataContainer.product_ingredient.forEach((item) => {
+          ingred.push({
+            id_material: item.id_material,
+            quantity: item.quantity,
+          })
+        })
+        dataContainer.product_sidedish.forEach((item) => {
+          sideDis.push({
+            id_sidedish: item.id_sidedish,
+          })
+        })
+        dataContainer.product_ingredient = ingred
+        dataContainer.product_sidedish = sideDis
+        this.childOutlet = outlet
+        this.formModel = dataContainer
+      }
+    },
+
+    async onSubmit() {
+      this.formModel.status = true
+      this.formModel.image = 'string'
+      this.$processLoading.SHOW({})
+      if (this.editedModel) {
+        delete this.formModel.department
+        delete this.formModel.created_at
+        delete this.formModel.deleted_at
+        delete this.formModel.updated_at
+        delete this.formModel.product_has_outlets
+        delete this.formModel.product_category
+        this.formModel.product_price = Number(this.formModel.product_price)
+        this.formModel.product_cogs = Number(this.formModel.product_cogs)
+        this.formModel.ppn = Number(this.formModel.ppn)
+        this.formModel.service = Number(this.formModel.service)
+        await this.updateModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      } else {
+        await this.createModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      }
+    },
   },
 }
 </script>

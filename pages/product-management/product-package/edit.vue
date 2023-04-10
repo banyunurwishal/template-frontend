@@ -9,7 +9,13 @@
           <b-col>
             <b-row>
               <b-col>
-                <h4>Create New Product Package</h4>
+                <h4>
+                  {{
+                    this.$route.params.id
+                      ? 'Edit New Product Package'
+                      : 'Create New Product Package'
+                  }}
+                </h4>
               </b-col>
             </b-row>
 
@@ -26,10 +32,11 @@
                             v-slot="validationContext"
                           >
                             <b-form-group label="Package Name*">
-                              <b-form-select
+                              <b-form-input
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.product_package_name"
                               >
-                              </b-form-select>
+                              </b-form-input>
                               <b-form-invalid-feedback
                                 id="input-1-live-feedback"
                                 >{{
@@ -47,6 +54,7 @@
                             <b-form-group label="Price*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.product_package_price"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -66,6 +74,7 @@
                             <b-form-group label="Cost of Good Sold*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.product_package_cogs"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -85,6 +94,7 @@
                             <b-form-group label="Tax %*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.ppn"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -104,6 +114,7 @@
                             <b-form-group label="Service*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.service"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -119,20 +130,11 @@
                             :rules="{ required: true }"
                             v-slot="validationContext"
                           >
-                            <b-form-group label="Outlet*">
-                              <b-form-checkbox-group
-                                :state="getValidationState(validationContext)"
-                                :options="optionsOutlet"
-                                stacked
-                              >
-                              </b-form-checkbox-group>
-                              <b-form-invalid-feedback
-                                id="input-1-live-feedback"
-                                >{{
-                                  validationContext.errors[0]
-                                }}</b-form-invalid-feedback
-                              >
-                            </b-form-group>
+                            <SelectOutlet
+                              :state="getValidationState(validationContext)"
+                              v-model="formModel.id_outlet"
+                              :hasData="childOutlet"
+                            />
                           </ValidationProvider>
                         </b-tab>
                         <b-tab title="Side Dish">
@@ -145,7 +147,9 @@
                             </b-button>
                           </div>
                           <div
-                            v-for="(item, index) in formModel.sideDish"
+                            v-for="(
+                              item, index
+                            ) in formModel.product_package_sidedish"
                             :key="index"
                           >
                             <div
@@ -155,7 +159,10 @@
                               <b-row>
                                 <b-col>
                                   <label for="">Side dish</label>
-                                  <b-form-select v-model="item.sidedish">
+                                  <b-form-select
+                                    :options="listSideDish"
+                                    v-model="item.id_sidedish"
+                                  >
                                   </b-form-select>
                                 </b-col>
                                 <b-col class="text-right" align-self="start">
@@ -163,7 +170,8 @@
                                     variant="danger"
                                     @click="handleDeleteItemSideDish(index)"
                                     :class="
-                                      formModel.sideDish.length > 1
+                                      formModel.product_package_sidedish
+                                        .length > 1
                                         ? ''
                                         : 'invisible'
                                     "
@@ -184,7 +192,9 @@
                             </b-button>
                           </div>
                           <div
-                            v-for="(item, index) in formModel.package"
+                            v-for="(
+                              item, index
+                            ) in formModel.product_package_group"
                             :key="index"
                           >
                             <div
@@ -193,20 +203,37 @@
                             >
                               <b-row>
                                 <b-col>
-                                  <b-form-group label="Department">
-                                    <b-form-select
-                                      :options="optionsDepartement"
-                                      v-model="item.department"
-                                    >
-                                    </b-form-select>
-                                  </b-form-group>
+                                  <ValidationProvider
+                                    name="department"
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                  >
+                                    <b-form-group label="Department">
+                                      <b-form-select
+                                        :state="
+                                          getValidationState(validationContext)
+                                        "
+                                        :options="listDepartment"
+                                        v-model="item.id_department"
+                                      >
+                                      </b-form-select>
+                                      <b-form-invalid-feedback
+                                        id="input-1-live-feedback"
+                                        >{{
+                                          validationContext.errors[0]
+                                        }}</b-form-invalid-feedback
+                                      >
+                                    </b-form-group>
+                                  </ValidationProvider>
                                   <b-form-group
                                     label="Package Item"
-                                    v-for="(items, index2) in item.menuItem"
+                                    v-for="(
+                                      items, index2
+                                    ) in item.product_package_menu"
                                     :key="index2"
                                   >
                                     <div class="d-flex">
-                                      <b-form-select v-model="items.menu">
+                                      <b-form-select v-model="items.id_product">
                                       </b-form-select>
                                       <b-button
                                         variant="danger"
@@ -215,8 +242,8 @@
                                           handleDeleteMenuItem(index, index2)
                                         "
                                         :class="
-                                          formModel.package[index].menuItem
-                                            .length > 0
+                                          formModel.product_package_group[index]
+                                            .product_package_menu.length > 0
                                             ? ''
                                             : 'invisible'
                                         "
@@ -228,17 +255,34 @@
                                     </div>
                                   </b-form-group>
 
-                                  <b-form-group label="Quantity">
-                                    <b-form-input v-model="item.quantity">
-                                    </b-form-input>
-                                  </b-form-group>
+                                  <ValidationProvider
+                                    name="Quantity"
+                                    :rules="{ required: true }"
+                                    v-slot="validationContext"
+                                  >
+                                    <b-form-group label="Quantity">
+                                      <b-form-input
+                                        :state="
+                                          getValidationState(validationContext)
+                                        "
+                                        v-model="item.max_qty"
+                                      >
+                                      </b-form-input>
+                                      <b-form-invalid-feedback
+                                        id="input-1-live-feedback"
+                                        >{{
+                                          validationContext.errors[0]
+                                        }}</b-form-invalid-feedback
+                                      >
+                                    </b-form-group>
+                                  </ValidationProvider>
                                 </b-col>
                                 <b-col class="text-right" align-self="start">
                                   <b-button
                                     variant="danger"
                                     @click="handleDeleteItem(index)"
                                     :class="
-                                      formModel.package.length > 1
+                                      formModel.product_package_group.length > 1
                                         ? ''
                                         : 'invisible'
                                     "
@@ -296,89 +340,114 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
 
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
+    SelectOutlet,
   },
   name: 'IndexPage',
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchListDepartment()
+    await this.fetchListSideDish()
+    if (this.$route.params.id) {
+      await this.handleEditModel()
+    }
     this.$processLoading.HIDE({})
   },
   data() {
     return {
-      optionsDepartement: [
-        { value: null, text: 'Please select an option' },
-        { value: 'q', text: 'Marketing' },
-        { value: 'gudang', text: 'Gudang' },
-        { value: 'pp', text: 'Sales' },
-        { value: 'pp', text: 'Kasir' },
-      ],
-      optionsOutlet: [
-        { value: null, text: 'Please select an option' },
-        { value: 'kop', text: 'Kopi Kenangan Buah Batu' },
-        { value: 'kop', text: 'Kopi Toko Djawa Buah Batu' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Buah Batu' },
-        { value: 'kop', text: 'Kopi Kenangan Bandung' },
-        { value: 'kop', text: 'Kopi Toko Djawa Bandung' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Bandung' },
-      ],
       formModel: {
-        package: [
+        product_package_group: [
           {
-            department: '',
-            menuItem: [],
-            quantity: '',
+            id_department: '',
+            product_package_menu: [],
+            max_qty: '',
           },
         ],
-        sideDish: [
+        product_package_sidedish: [
           {
-            sidedish: '',
+            id_sidedish: '',
           },
         ],
       },
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      editedModel: (state) => state.productPackage.model,
+      listDepartment: (state) => {
+        let data = []
+        state.options.listDepartment.forEach((item) => {
+          data.push({
+            text: item.department_name,
+            value: item.id_department,
+          })
+        })
+        return data
+      },
+      listSideDish: (state) => {
+        let data = []
+        state.options.listSideDish.forEach((item) => {
+          data.push({
+            text: item.sidedish_name,
+            value: item.id_sidedish,
+          })
+        })
+        return data
+      },
+    }),
+  },
   methods: {
+    ...mapActions('productPackage', [
+      'fetchLists',
+      'createModel',
+      'fetchModel',
+      'updateModel',
+    ]),
+    ...mapActions('options', ['fetchListDepartment', 'fetchListSideDish']),
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
     },
 
     handleItem() {
-      this.formModel.package.push({
-        department: '',
-        menuItem: [],
-        quantity: '',
+      this.formModel.product_package_group.push({
+        id_department: '',
+        product_package_menu: [],
+        max_qty: '',
       })
     },
 
     handleItemSideDish() {
-      this.formModel.sideDish.push({
-        sidedish: '',
+      this.formModel.product_package_sidedish.push({
+        id_sidedish: '',
       })
     },
 
     handleAddMenuItem(index) {
-      console.log(this.formModel.package[index].menuItem)
-      this.formModel.package[index].menuItem.push({
-        menu: '',
+      this.formModel.product_package_group[index].product_package_menu.push({
+        id_product: '',
       })
     },
 
     handleDeleteItem(index) {
-      this.formModel.package.splice(index, 1)
+      this.formModel.product_package_group.splice(index, 1)
     },
 
     handleDeleteItemSideDish(index) {
-      this.formModel.sideDish.splice(index, 1)
+      this.formModel.product_package_sidedish.splice(index, 1)
     },
 
     handleDeleteMenuItem(index, index2) {
-      this.formModel.package[index].menuItem.splice(index2, 1)
+      this.formModel.product_package_group[index].product_package_menu.splice(
+        index2,
+        1
+      )
     },
 
     handleCancelBtn() {

@@ -47,7 +47,7 @@
         <b-row class="px-3 mt-2">
           <b-col>
             <b-table
-              :items="items"
+              :items="listProductPackage"
               :per-page="perPage"
               :current-page="currentPage"
               :fields="fields"
@@ -56,6 +56,18 @@
               striped
               class="table-header shadow-table"
             >
+              <template #cell(outlet)="data">
+                <span
+                  v-for="(item, index) in data.item.product_package_has_outlets"
+                  :key="index"
+                >
+                  {{
+                    index > 0
+                      ? ', ' + item.outlets.outlet_name
+                      : item.outlets.outlet_name
+                  }}
+                </span>
+              </template>
               <template #cell(actions)="data">
                 <b-dropdown
                   variant="link"
@@ -66,8 +78,12 @@
                   <template #button-content>
                     <dots />
                   </template>
-                  <b-dropdown-item> Edit </b-dropdown-item>
-                  <b-dropdown-item> Delete </b-dropdown-item>
+                  <b-dropdown-item @click="handleEdit(data.item)">
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="handleDelete(data.item)">
+                    Delete
+                  </b-dropdown-item>
                 </b-dropdown>
               </template>
             </b-table>
@@ -91,36 +107,31 @@
 import dots from '@/assets/icon/dots.vue'
 import importIcon from '@/assets/icon/import.vue'
 import exportIcon from '@/assets/icon/export.vue'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'IndexPage',
   components: { importIcon, exportIcon, dots },
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchLists()
     this.$processLoading.HIDE({})
   },
   data() {
     return {
       currentPage: 1,
       perPage: 5,
-      items: [
-        {
-          outlet_name: 'name',
-          product_name: 'name',
-          price: 'name',
-        },
-      ],
       fields: [
         {
-          key: 'outlet_name',
+          key: 'outlet',
           label: 'Outlet Name',
         },
         {
-          key: 'product_name',
+          key: 'product_package_name',
           label: 'Product Name',
         },
         {
-          key: 'price',
+          key: 'product_package_price',
           label: 'Price',
         },
         {
@@ -130,20 +141,27 @@ export default {
       ],
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      listProductPackage: (state) => state.productPackage.lists,
+    }),
+  },
   methods: {
+    ...mapActions('productPackage', ['fetchLists', 'deleteModel']),
     handleAdd() {
       this.$router.push('/product-management/product-package/add')
     },
     handleEdit(data) {
-      this.$router.push('/product-management/product-package/' + data.id)
+      this.$router.push(
+        '/product-management/product-package/' + data.id_product_package
+      )
     },
 
     async handleDelete(data) {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.uuid)
+          await this.deleteModel(data.id_product_package)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')

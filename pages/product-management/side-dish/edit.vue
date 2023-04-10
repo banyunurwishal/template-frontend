@@ -9,7 +9,13 @@
           <b-col>
             <b-row>
               <b-col>
-                <h4>Create New Side Dish</h4>
+                <h4>
+                  {{
+                    this.$route.params.id
+                      ? 'Edit New Side Dish'
+                      : 'Create New Side Dish'
+                  }}
+                </h4>
               </b-col>
             </b-row>
             <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
@@ -27,7 +33,8 @@
                             <b-form-group label="Department*">
                               <b-form-select
                                 :state="getValidationState(validationContext)"
-                                :options="optionsDepartement"
+                                :options="listDepartment"
+                                v-model="formModel.id_department"
                               >
                               </b-form-select>
                               <b-form-invalid-feedback
@@ -47,6 +54,7 @@
                             <b-form-group label="Side Dish Name*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                v-model="formModel.sidedish_name"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -66,6 +74,8 @@
                             <b-form-group label="Price*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                number
+                                v-model="formModel.sidedish_price"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -85,6 +95,8 @@
                             <b-form-group label="Cost of Good Sold*">
                               <b-form-input
                                 :state="getValidationState(validationContext)"
+                                number
+                                v-model="formModel.sidedish_cogs"
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -100,20 +112,11 @@
                             :rules="{ required: true }"
                             v-slot="validationContext"
                           >
-                            <b-form-group label="Outlet*">
-                              <b-form-checkbox-group
-                                :state="getValidationState(validationContext)"
-                                :options="optionsOutlet"
-                                stacked
-                              >
-                              </b-form-checkbox-group>
-                              <b-form-invalid-feedback
-                                id="input-1-live-feedback"
-                                >{{
-                                  validationContext.errors[0]
-                                }}</b-form-invalid-feedback
-                              >
-                            </b-form-group>
+                            <SelectOutlet
+                              :state="getValidationState(validationContext)"
+                              v-model="formModel.id_outlet"
+                              :hasData="childOutlet"
+                            />
                           </ValidationProvider>
                         </b-tab>
                         <b-tab title="Ingredients">
@@ -123,7 +126,7 @@
                             </b-button>
                           </div>
                           <div
-                            v-for="(item, index) in formModel.ingredient"
+                            v-for="(item, index) in formModel.ingredients"
                             :key="index"
                           >
                             <div
@@ -133,15 +136,30 @@
                               <b-row>
                                 <b-col>
                                   <b-form-group label="Ingredient">
-                                    <b-form-select v-model="item.ingredient">
+                                    <b-form-select
+                                      :options="listMaterials"
+                                      v-model="item.id_material"
+                                      @change="
+                                        handleChangeIngredient(
+                                          item.id_material,
+                                          index
+                                        )
+                                      "
+                                    >
                                     </b-form-select>
                                   </b-form-group>
                                   <b-form-group label="Quantity">
-                                    <b-form-input v-model="item.quantity">
+                                    <b-form-input
+                                      v-model="item.quantity"
+                                      number
+                                    >
                                     </b-form-input>
                                   </b-form-group>
                                   <b-form-group label="Ingredient Unit">
-                                    <b-form-input v-model="item.ingredientUnit">
+                                    <b-form-input
+                                      v-model="item.ingredientUnit"
+                                      readonly
+                                    >
                                     </b-form-input>
                                   </b-form-group>
                                 </b-col>
@@ -150,7 +168,7 @@
                                     variant="danger"
                                     @click="handleDeleteItem(index)"
                                     :class="
-                                      formModel.ingredient.length > 1
+                                      formModel.ingredients.length > 1
                                         ? ''
                                         : 'invisible'
                                     "
@@ -199,75 +217,160 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
 
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
+    SelectOutlet,
   },
   name: 'IndexPage',
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchListDepartment()
+    await this.fetchListMaterials()
+    if (this.$route.params.id) {
+      await this.handleEditModel()
+    }
     this.$processLoading.HIDE({})
   },
   data() {
     return {
+      childOutlet: [],
       formModel: {
-        ingredient: [
+        ingredients: [
           {
-            ingredient: '',
+            id_material: '',
             quantity: '',
             ingredientUnit: '',
           },
         ],
       },
-      optionsCompany: [
-        { value: null, text: 'Please select an option' },
-        { value: 'q', text: 'Kopi Kenangan' },
-        { value: 'kak', text: 'Kopi Toko Djawa' },
-        { value: 'kak', text: 'Kopi Janji Jiwa' },
-      ],
-      optionsDepartement: [
-        { value: null, text: 'Please select an option' },
-        { value: 'q', text: 'Marketing' },
-        { value: 'gudang', text: 'Gudang' },
-        { value: 'pp', text: 'Sales' },
-        { value: 'pp', text: 'Kasir' },
-      ],
-      optionsOutlet: [
-        { value: null, text: 'Please select an option' },
-        { value: 'kop', text: 'Kopi Kenangan Buah Batu' },
-        { value: 'kop', text: 'Kopi Toko Djawa Buah Batu' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Buah Batu' },
-        { value: 'kop', text: 'Kopi Kenangan Bandung' },
-        { value: 'kop', text: 'Kopi Toko Djawa Bandung' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Bandung' },
-      ],
     }
   },
-  computed: {},
+  computed: {
+    ...mapState({
+      editedModel: (state) => state.sideDish.model,
+      listDepartment: (state) => {
+        let data = []
+        state.options.listDepartment.forEach((item) => {
+          data.push({
+            text: item.department_name,
+            value: item.id_department,
+          })
+        })
+        return data
+      },
+      listMaterials: (state) => {
+        let data = []
+        state.options.listMaterials.forEach((item) => {
+          data.push({
+            text: item.name,
+            value: item.id,
+            unit: item.unit,
+          })
+        })
+        return data
+      },
+    }),
+  },
   methods: {
+    ...mapActions('sideDish', [
+      'fetchLists',
+      'createModel',
+      'fetchModel',
+      'updateModel',
+    ]),
+    ...mapActions('options', ['fetchListDepartment', 'fetchListMaterials']),
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
     },
 
     handleItem() {
-      this.formModel.ingredient.push({
-        ingredient: '',
+      this.formModel.ingredients.push({
+        id_material: '',
         quantity: '',
         ingredientUnit: '',
       })
     },
 
+    async handleEditModel() {
+      let id = await this.$route.params.id
+      await this.fetchModel(id)
+      if (this.editedModel) {
+        let dataContainer = {}
+        let outlet = []
+        let ingred = []
+        Object.assign(dataContainer, this.editedModel)
+        dataContainer.sidedish_has_outlets.forEach((item) => {
+          outlet.push(item.outlets.id_outlet)
+        })
+        dataContainer.sidedish_ingredient.forEach((item) => {
+          ingred.push({
+            id_material: item.id_material,
+            quantity: item.quantity,
+          })
+        })
+        dataContainer.ingredients = ingred
+        this.childOutlet = outlet
+        this.formModel = dataContainer
+      }
+    },
+
     handleDeleteItem(index) {
-      this.formModel.ingredient.splice(index, 1)
+      this.formModel.ingredients.splice(index, 1)
     },
 
     handleCancelBtn() {
       this.$router.push('/product-management/side-dish')
     },
-    async onSubmit() {},
+
+    async onSubmit() {
+      await this.formModel.ingredients.forEach((e) => {
+        delete e.ingredientUnit
+      })
+      this.formModel.sidedish_price = Number(this.formModel.sidedish_price)
+      this.formModel.sidedish_cogs = Number(this.formModel.sidedish_cogs)
+      this.$processLoading.SHOW({})
+      if (this.editedModel) {
+        await this.updateModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      } else {
+        await this.createModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      }
+    },
+
+    handleChangeIngredient(data, index) {
+      this.listMaterials.find((x) => {
+        if (x.value == data) {
+          this.formModel.ingredients[index].ingredientUnit = x.unit.name
+        }
+      })
+    },
   },
 }
 </script>
