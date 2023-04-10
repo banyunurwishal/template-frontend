@@ -96,9 +96,7 @@ export default {
   name: 'IndexPage',
   async created() {
     this.$processLoading.SHOW({})
-    await this.fetchListOutlet()
     if (this.$route.params.id) {
-      console.log(this.$route.params.id)
       await this.handleEditModel()
     }
     this.$processLoading.HIDE({})
@@ -123,16 +121,6 @@ export default {
   },
   computed: {
     ...mapState({
-      listOutlet: (state) => {
-        let data = []
-        state.options.listOutlet.forEach((item) => {
-          data.push({
-            text: item.outlet_name,
-            value: item.id_outlet,
-          })
-        })
-        return data
-      },
       editedModel: (state) => state.department.model,
     }),
   },
@@ -143,7 +131,6 @@ export default {
       'fetchModel',
       'updateModel',
     ]),
-    ...mapActions('options', ['fetchListOutlet']),
 
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
