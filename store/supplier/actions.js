@@ -26,7 +26,7 @@ export default {
   },
 
   async createModel({ commit }, payload) {
-    return await this.$axios.post('/staff', payload)
+    return await this.$axios.post('/suppliers', payload)
   },
 
   async updateModel({ commit, state }, payload) {

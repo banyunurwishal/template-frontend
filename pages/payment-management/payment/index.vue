@@ -29,7 +29,7 @@
         <b-row class="px-3 mt-3">
           <b-col>
             <b-table
-              :items="items"
+              :items="listPayment"
               :per-page="perPage"
               :current-page="currentPage"
               :fields="fields"
@@ -38,6 +38,9 @@
               striped
               class="table-header shadow-table"
             >
+              <template #cell(type)="data">
+                <span>{{ data.bank_type != 1 ? 'Bank' : 'E-Payment' }}</span>
+              </template>
               <template #cell(actions)="data">
                 <b-dropdown
                   variant="link"
@@ -48,8 +51,12 @@
                   <template #button-content>
                     <dots />
                   </template>
-                  <b-dropdown-item> Edit </b-dropdown-item>
-                  <b-dropdown-item> Delete </b-dropdown-item>
+                  <b-dropdown-item @click="handleEdit(data.item)">
+                    Edit
+                  </b-dropdown-item>
+                  <b-dropdown-item @click="handleDelete(data.item)">
+                    Delete
+                  </b-dropdown-item>
                 </b-dropdown>
               </template>
             </b-table>
@@ -70,6 +77,8 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
+
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
 
@@ -78,26 +87,17 @@ export default {
   components: { dots, plus },
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchLists()
+
     this.$processLoading.HIDE({})
   },
   data() {
     return {
       currentPage: 1,
       perPage: 5,
-      items: [
-        {
-          company: 'name',
-          bank: 'name',
-          type: 'name',
-        },
-      ],
       fields: [
         {
-          key: 'company',
-          label: 'Company',
-        },
-        {
-          key: 'bank',
+          key: 'bank_name',
           label: 'Bank',
         },
         {
@@ -111,20 +111,28 @@ export default {
       ],
     }
   },
-  computed: {},
+  computed: {
+    rows() {
+      return this.listPayment.length
+    },
+    ...mapState({
+      listPayment: (state) => state.payment.lists,
+    }),
+  },
   methods: {
+    ...mapActions('payment', ['fetchLists', 'deleteModel']),
     handleAdd() {
       this.$router.push('/payment-management/payment/add')
     },
     handleEdit(data) {
-      this.$router.push('/payment-management/payment/' + data.id)
+      this.$router.push('/payment-management/payment/' + data.id_bank)
     },
 
     async handleDelete(data) {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.uuid)
+          await this.deleteModel(data.id_bank)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')

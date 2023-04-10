@@ -8,7 +8,7 @@
       <div class="section-body">
         <b-row>
           <b-col cols="12">
-            <h4>{{ isEdited ? 'Edit Material' : 'Add Material' }}</h4>
+            <h4>{{ isEdited ? 'Edit Customer' : 'Add Customer' }}</h4>
           </b-col>
         </b-row>
         <b-row>
@@ -23,7 +23,7 @@
                       :rules="{ required: true }"
                       v-slot="validationContext"
                     >
-                      <b-form-group label="Name">
+                      <b-form-group label="Name*">
                         <b-form-input
                           v-model="formModel.name"
                           placeholder="Enter Name"
@@ -36,45 +36,33 @@
                     </ValidationProvider>
 
                     <ValidationProvider
-                      name="po_unit"
+                      name="address"
                       :rules="{ required: true }"
                       v-slot="validationContext"
                     >
-                      <b-form-group label="PO Unit">
-                        <b-form-select
-                          v-model="formModel.po_unit"
+                      <b-form-group label="Address*">
+                        <b-form-textarea
+                          v-model="formModel.address"
+                          placeholder="Enter Address"
+                          rows="3"
                           :state="getValidationState(validationContext)"
-                          :options="listUnit"
-                        ></b-form-select>
+                        ></b-form-textarea>
                         <b-form-invalid-feedback id="input-1-live-feedback">{{
                           validationContext.errors[0]
                         }}</b-form-invalid-feedback>
                       </b-form-group>
                     </ValidationProvider>
+
                     <ValidationProvider
-                      name="ingredient"
+                      name="phone"
                       :rules="{ required: true }"
                       v-slot="validationContext"
                     >
-                      <b-form-group label="Ingredient">
-                        <b-form-select
-                          v-model="formModel.ingredient"
-                          :options="listUnit"
-                          :state="getValidationState(validationContext)"
-                        ></b-form-select>
-                        <b-form-invalid-feedback id="input-1-live-feedback">{{
-                          validationContext.errors[0]
-                        }}</b-form-invalid-feedback>
-                      </b-form-group>
-                    </ValidationProvider>
-                    <ValidationProvider
-                      name="prod_code"
-                      :rules="{ required: false }"
-                      v-slot="validationContext"
-                    >
-                      <b-form-group label="Product Code (Opsional)">
+                      <b-form-group label="Phone*">
                         <b-form-input
-                          v-model="formModel.product_code"
+                          type="phone"
+                          v-model="formModel.phone"
+                          placeholder="Enter Phone Number"
                           :state="getValidationState(validationContext)"
                         ></b-form-input>
                         <b-form-invalid-feedback id="input-1-live-feedback">{{
@@ -82,79 +70,33 @@
                         }}</b-form-invalid-feedback>
                       </b-form-group>
                     </ValidationProvider>
-                    <hr />
-                    <div>
-                      <b-row>
-                        <b-col>
-                          <h4 class="text-center">Conversion</h4>
-                        </b-col>
-                      </b-row>
-                      <b-row class="mt-2">
-                        <b-col cols="5">
-                          <h5 class="text-center">PO Unit</h5>
-                          <ValidationProvider
-                            name="name"
-                            :rules="{ required: true }"
-                            v-slot="validationContext"
-                          >
-                            <b-form-group>
-                              <b-form-input
-                                v-model="formModel.po_number"
-                                type="number"
-                                placeholder="Enter"
-                                readOnly
-                                :state="getValidationState(validationContext)"
-                              ></b-form-input>
-                              <b-form-invalid-feedback
-                                id="input-1-live-feedback"
-                                >{{
-                                  validationContext.errors[0]
-                                }}</b-form-invalid-feedback
-                              >
-                            </b-form-group>
-                          </ValidationProvider>
-                        </b-col>
-                        <b-col cols="2"><h5 class="text-center">To</h5></b-col>
-                        <b-col cols="5">
-                          <h5 class="text-center">Ingredient</h5>
-                          <ValidationProvider
-                            name="name"
-                            :rules="{ required: true }"
-                            v-slot="validationContext"
-                          >
-                            <b-form-group>
-                              <b-form-input
-                                type="number"
-                                v-model="formModel.ingredient_number"
-                                placeholder="Enter"
-                                :state="getValidationState(validationContext)"
-                              ></b-form-input>
-                              <b-form-invalid-feedback
-                                id="input-1-live-feedback"
-                                >{{
-                                  validationContext.errors[0]
-                                }}</b-form-invalid-feedback
-                              >
-                            </b-form-group>
-                          </ValidationProvider>
-                        </b-col>
-                      </b-row>
-                      <hr />
-                      <b-row>
-                        <b-col>
-                          <ValidationProvider
-                            name="outlet"
-                            :rules="{ required: true }"
-                            v-slot="validationContext"
-                          >
-                            <SelectOutlet
-                              :state="getValidationState(validationContext)"
-                              v-model="formModel.id_outlets"
-                            />
-                          </ValidationProvider>
-                        </b-col>
-                      </b-row>
-                    </div>
+
+                    <ValidationProvider
+                      name="pic"
+                      :rules="{ required: true }"
+                      v-slot="validationContext"
+                    >
+                      <b-form-group label="Person In Change*">
+                        <b-form-input
+                          v-model="formModel.pic"
+                          placeholder="Enter Person In Change"
+                          :state="getValidationState(validationContext)"
+                        ></b-form-input>
+                        <b-form-invalid-feedback id="input-1-live-feedback">{{
+                          validationContext.errors[0]
+                        }}</b-form-invalid-feedback>
+                      </b-form-group>
+                    </ValidationProvider>
+                    <ValidationProvider
+                      name="outlet"
+                      :rules="{ required: true }"
+                      v-slot="validationContext"
+                    >
+                      <SelectOutlet
+                        :state="getValidationState(validationContext)"
+                        v-model="formModel.id_outlet"
+                      />
+                    </ValidationProvider>
 
                     <div class="text-right">
                       <b-button variant="danger" @click="redirectLink"
@@ -188,7 +130,7 @@ export default {
   },
   async created() {
     this.$processLoading.SHOW({})
-    await this.fetchListsUnit()
+    await this.fetchListOutlet()
     if (this.isEdited) {
       await this.handleEditModel()
     }
@@ -196,22 +138,22 @@ export default {
   },
   data() {
     return {
-      formModel: { po_number: 1, price: 0, ingredient_number: 0 },
+      formModel: {},
     }
   },
   computed: {
     ...mapState({
-      listUnit: (state) => {
+      listOutlet: (state) => {
         let data = []
-        state.options.listUnit.forEach((item) => {
+        state.options.listOutlet.forEach((item) => {
           data.push({
-            text: item.short_name,
-            value: item.id,
+            text: item.outlet_name,
+            value: item.id_outlet,
           })
         })
         return data
       },
-      editModel: (state) => state.material.model,
+      editModel: (state) => state.customer.model,
     }),
     isEdited() {
       return this.$route.params.id != null
@@ -221,13 +163,13 @@ export default {
     },
   },
   methods: {
-    ...mapActions('material', [
+    ...mapActions('customer', [
       'createModel',
       'fetchLists',
       'fetchModel',
       'updateModel',
     ]),
-    ...mapActions('options', ['fetchListsUnit']),
+    ...mapActions('options', ['fetchListOutlet']),
 
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
@@ -240,29 +182,18 @@ export default {
         let arry = []
 
         Object.assign(dataContainer, this.editModel)
-        dataContainer.material_has_outlets.forEach((item) => {
-          arry.push(item.id_outlet)
+        dataContainer.customer_has_outlets.forEach((e) => {
+          arry.push(e.outlets.id_outlet)
         })
-        delete dataContainer.material_has_outlets
-        delete dataContainer.ingredients
-        delete dataContainer.unit
-        Object.assign(this.formModel, dataContainer)
+        delete dataContainer.customer_has_outlets
         this.formModel = dataContainer
-        this.formModel.po_unit = dataContainer.po_unit
-        this.formModel.ingredients = dataContainer.ingredients
-        this.formModel.id_outlets = arry
+        this.formModel.id_outlet = arry
       }
     },
 
     async onSubmit() {
       this.$processLoading.SHOW({})
       if (this.isEdited) {
-        let po = parseInt(this.formModel.po_number)
-        this.formModel.po_number = po
-        let ing = parseInt(this.formModel.ingredient_number)
-        this.formModel.ingredient_number = ing
-        let prc = parseInt(this.formModel.price)
-        this.formModel.price = prc
         await this.updateModel(this.formModel)
           .then((res) => {
             this.$processLoading.HIDE({})
@@ -276,8 +207,7 @@ export default {
             this.alertToastFail('Data gagal Disimpan')
           })
       } else {
-        let bau = parseInt(this.formModel.ingredient_number)
-        this.formModel.ingredient_number = bau
+        console.log(this.formModel)
         await this.createModel(this.formModel)
           .then((res) => {
             this.$processLoading.HIDE({})
@@ -293,7 +223,7 @@ export default {
       }
     },
     redirectLink() {
-      this.$router.push('/master-data/material')
+      this.$router.push('/master-data/customer')
     },
   },
 }

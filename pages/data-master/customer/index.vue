@@ -21,7 +21,7 @@
         <b-row class="px-3 mt-3">
           <b-col>
             <b-table
-              :items="items"
+              :items="listCustomer"
               :per-page="perPage"
               :current-page="currentPage"
               responsive
@@ -66,20 +66,21 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
+
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
 
 export default {
-  name: 'supplier',
+  name: 'customer',
   components: { dots, plus },
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchLists()
+
     this.$processLoading.HIDE({})
   },
-  async created() {
-    this.$processLoading.SHOW({})
-    this.$processLoading.HIDE({})
-  },
+
   data() {
     return {
       perPage: 10,
@@ -106,38 +107,31 @@ export default {
           label: 'Actions',
         },
       ],
-      items: [
-        {
-          id: 1,
-          name: 'gudang',
-          address: 'Bandung',
-          phone: '0826276729',
-          pic: 'Ayah',
-        },
-        {
-          id: 1,
-          name: 'Makmur Bahagia',
-          address: 'Jakarta',
-          phone: '0821111119',
-          pic: 'Ibu',
-        },
-      ],
     }
   },
-  computed: {},
+  computed: {
+    rows() {
+      return this.listCustomer.length
+    },
+    ...mapState({
+      listCustomer: (state) => state.customer.lists,
+    }),
+  },
   methods: {
+    ...mapActions('customer', ['fetchLists', 'deleteModel']),
+
     handleAdd() {
-      this.$router.push('/master-data/supplier/add')
+      this.$router.push('/master-data/customer/add')
     },
     handleEdit(data) {
-      this.$router.push('/master-data/supplier/' + data.id)
+      this.$router.push('/master-data/customer/' + data.id_customer)
     },
 
     async handleDelete(data) {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.uuid)
+          await this.deleteModel(data.id_customer)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')

@@ -21,7 +21,7 @@
         <b-row class="px-3 mt-3">
           <b-col>
             <b-table
-              :items="items"
+              :items="listSupplier"
               :per-page="perPage"
               :current-page="currentPage"
               responsive
@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
 
@@ -74,12 +75,11 @@ export default {
   components: { dots, plus },
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchLists()
+
     this.$processLoading.HIDE({})
   },
-  async created() {
-    this.$processLoading.SHOW({})
-    this.$processLoading.HIDE({})
-  },
+
   data() {
     return {
       perPage: 10,
@@ -106,26 +106,19 @@ export default {
           label: 'Actions',
         },
       ],
-      items: [
-        {
-          id: 1,
-          name: 'gudang',
-          address: 'Bandung',
-          phone: '0826276729',
-          pic: 'Ayah',
-        },
-        {
-          id: 1,
-          name: 'Makmur Bahagia',
-          address: 'Jakarta',
-          phone: '0821111119',
-          pic: 'Ibu',
-        },
-      ],
     }
   },
-  computed: {},
+  computed: {
+    rows() {
+      return this.listSupplier.length
+    },
+    ...mapState({
+      listSupplier: (state) => state.supplier.lists,
+    }),
+  },
   methods: {
+    ...mapActions('supplier', ['fetchLists', 'deleteModel']),
+
     handleAdd() {
       this.$router.push('/master-data/supplier/add')
     },
@@ -137,7 +130,7 @@ export default {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.uuid)
+          await this.deleteModel(data.id)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')

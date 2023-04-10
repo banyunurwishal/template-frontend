@@ -21,7 +21,7 @@
         <b-row class="px-3 mt-3">
           <b-col>
             <b-table
-              :items="items"
+              :items="listMaterial"
               :per-page="perPage"
               :current-page="currentPage"
               responsive
@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
 
@@ -74,10 +75,7 @@ export default {
   components: { dots, plus },
   async created() {
     this.$processLoading.SHOW({})
-    this.$processLoading.HIDE({})
-  },
-  async created() {
-    this.$processLoading.SHOW({})
+    await this.fetchLists()
     this.$processLoading.HIDE({})
   },
   data() {
@@ -90,11 +88,11 @@ export default {
           label: 'Name',
         },
         {
-          key: 'po_unit',
+          key: 'unit.name',
           label: 'PO Unit',
         },
         {
-          key: 'ingredient',
+          key: 'ingredients.name',
           label: 'Ingredient',
         },
         {
@@ -102,14 +100,19 @@ export default {
           label: 'Actions',
         },
       ],
-      items: [
-        { id: 1, name: 'slice', po_unit: 'slc', ingredient: 'slc' },
-        { id: 1, name: 'scoop', po_unit: 'sc', ingredient: 'sc' },
-      ],
     }
   },
-  computed: {},
+  computed: {
+    rows() {
+      return this.listMaterial.length
+    },
+    ...mapState({
+      listMaterial: (state) => state.material.lists,
+    }),
+  },
   methods: {
+    ...mapActions('material', ['fetchLists', 'deleteModel']),
+
     handleAdd() {
       this.$router.push('/master-data/material/add')
     },
@@ -121,7 +124,7 @@ export default {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.uuid)
+          await this.deleteModel(data.id)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')

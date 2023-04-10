@@ -25,9 +25,9 @@
                     >
                       <b-form-group label="Supplier">
                         <b-form-select
-                          v-model="formModel.supplier"
+                          v-model="formModel.id_supplier"
                           placeholder="Enter Name"
-                          :options="optionsSupplier"
+                          :options="listSupplier"
                           :state="getValidationState(validationContext)"
                         ></b-form-select>
                         <b-form-invalid-feedback id="input-1-live-feedback">{{
@@ -43,9 +43,9 @@
                     >
                       <b-form-group label="Material">
                         <b-form-select
-                          v-model="formModel.material"
+                          v-model="formModel.id_material"
                           :state="getValidationState(validationContext)"
-                          :options="optionsMaterial"
+                          :options="listMaterial"
                         ></b-form-select>
                         <b-form-invalid-feedback id="input-1-live-feedback">{{
                           validationContext.errors[0]
@@ -59,7 +59,7 @@
                     >
                       <b-form-group label="Price">
                         <b-form-input
-                          v-model="formModel.ingredient"
+                          v-model="formModel.price"
                           type="number"
                           :state="getValidationState(validationContext)"
                         ></b-form-input>
@@ -73,17 +73,10 @@
                       :rules="{ required: true }"
                       v-slot="validationContext"
                     >
-                      <b-form-group label="Outlet*">
-                        <b-form-checkbox-group
-                          :state="getValidationState(validationContext)"
-                          :options="optionsOutlet"
-                          stacked
-                        >
-                        </b-form-checkbox-group>
-                        <b-form-invalid-feedback id="input-1-live-feedback">{{
-                          validationContext.errors[0]
-                        }}</b-form-invalid-feedback>
-                      </b-form-group>
+                      <SelectOutlet
+                        :state="getValidationState(validationContext)"
+                        v-model="formModel.id_outlet"
+                      />
                     </ValidationProvider>
 
                     <div class="text-right">
@@ -106,43 +99,54 @@
 </template>
 
 <script>
-import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import { mapActions, mapState } from 'vuex'
+
+import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
 
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
+    SelectOutlet,
   },
   async created() {
-    // this.$processLoading.SHOW({})
-    // if (this.isEdited) {
-    //   await this.handleEditModel()
-    // }
-    // this.$processLoading.HIDE({})
+    this.$processLoading.SHOW({})
+    await this.fetchListsSupplier()
+    await this.fetchListsMaterial()
+    if (this.isEdited) {
+      await this.handleEditModel()
+    }
+    this.$processLoading.HIDE({})
   },
   data() {
     return {
       formModel: {},
-      options: [
-        { value: null, text: 'Please select an option' },
-        { value: 'slc', text: 'Slice' },
-        { value: 'scoop', text: 'Scoop' },
-      ],
-      optionsOutlet: [
-        { value: null, text: 'Please select an option' },
-        { value: 'kop', text: 'Kopi Kenangan Buah Batu' },
-        { value: 'kop', text: 'Kopi Toko Djawa Buah Batu' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Buah Batu' },
-        { value: 'kop', text: 'Kopi Kenangan Bandung' },
-        { value: 'kop', text: 'Kopi Toko Djawa Bandung' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Bandung' },
-      ],
     }
   },
   computed: {
     ...mapState({
-      //   editModel: (state) => state.companyManage.model,
+      listSupplier: (state) => {
+        let data = []
+        state.options.listSupplier.forEach((item) => {
+          data.push({
+            text: item.name,
+            value: item.id,
+          })
+        })
+        return data
+      },
+      listMaterial: (state) => {
+        let data = []
+        state.options.listMaterial.forEach((item) => {
+          data.push({
+            text: item.name,
+            value: item.id,
+          })
+        })
+        return data
+      },
+      editModel: (state) => state.mdl.model,
     }),
     isEdited() {
       return this.$route.params.id != null
@@ -152,12 +156,13 @@ export default {
     },
   },
   methods: {
-    // ...mapActions('companyManage', [
-    //   'createModel',
-    //   'fetchLists',
-    //   'fetchModel',
-    //   'updateModel',
-    // ]),
+    ...mapActions('mdl', [
+      'createModel',
+      'fetchLists',
+      'fetchModel',
+      'updateModel',
+    ]),
+    ...mapActions('options', ['fetchListsSupplier', 'fetchListsMaterial']),
 
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
@@ -167,13 +172,25 @@ export default {
       await this.fetchModel(this.editedModelId)
       if (this.editModel) {
         let dataContainer = {}
+        let arry = []
+
         Object.assign(dataContainer, this.editModel)
+        dataContainer.listing_has_outlets.forEach((item) => {
+          arry.push(item.outlets.id_outlet)
+        })
+        delete dataContainer.listing_has_outlets
+        delete dataContainer.materials
+        delete dataContainer.suppliers
+        Object.assign(this.formModel, dataContainer)
         this.formModel = dataContainer
+        this.formModel.id_outlet = arry
       }
     },
 
     async onSubmit() {
       this.$processLoading.SHOW({})
+      let prc = parseInt(this.formModel.price)
+      this.formModel.price = prc
       if (this.isEdited) {
         await this.updateModel(this.formModel)
           .then((res) => {
