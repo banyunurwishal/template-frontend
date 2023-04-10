@@ -23,7 +23,7 @@
                       :rules="{ required: true }"
                       v-slot="validationContext"
                     >
-                      <b-form-group label="Name">
+                      <b-form-group label="Name*">
                         <b-form-input
                           v-model="formModel.name"
                           placeholder="Enter Name"
@@ -40,7 +40,7 @@
                       :rules="{ required: true }"
                       v-slot="validationContext"
                     >
-                      <b-form-group label="Short Name">
+                      <b-form-group label="Short Name*">
                         <b-form-input
                           v-model="formModel.short_name"
                           placeholder="Enter Short Name"
@@ -56,17 +56,10 @@
                       :rules="{ required: true }"
                       v-slot="validationContext"
                     >
-                      <b-form-group label="Outlet*">
-                        <b-form-checkbox-group
-                          :state="getValidationState(validationContext)"
-                          :options="optionsOutlet"
-                          stacked
-                        >
-                        </b-form-checkbox-group>
-                        <b-form-invalid-feedback id="input-1-live-feedback">{{
-                          validationContext.errors[0]
-                        }}</b-form-invalid-feedback>
-                      </b-form-group>
+                      <SelectOutlet
+                        :state="getValidationState(validationContext)"
+                        v-model="formModel.id_outlets"
+                      />
                     </ValidationProvider>
 
                     <div class="text-right">
@@ -89,38 +82,43 @@
 </template>
 
 <script>
-import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import { mapActions, mapState } from 'vuex'
+
+import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
 
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
+    SelectOutlet,
   },
   async created() {
-    // this.$processLoading.SHOW({})
-    // if (this.isEdited) {
-    //   await this.handleEditModel()
-    // }
-    // this.$processLoading.HIDE({})
+    this.$processLoading.SHOW({})
+    await this.fetchListOutlet()
+    if (this.isEdited) {
+      await this.handleEditModel()
+    }
+    this.$processLoading.HIDE({})
   },
   data() {
     return {
       formModel: {},
-      optionsOutlet: [
-        { value: null, text: 'Please select an option' },
-        { value: 'kop', text: 'Kopi Kenangan Buah Batu' },
-        { value: 'kop', text: 'Kopi Toko Djawa Buah Batu' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Buah Batu' },
-        { value: 'kop', text: 'Kopi Kenangan Bandung' },
-        { value: 'kop', text: 'Kopi Toko Djawa Bandung' },
-        { value: 'kak', text: 'Kopi Janji Jiwa Bandung' },
-      ],
     }
   },
   computed: {
     ...mapState({
-      //   editModel: (state) => state.companyManage.model,
+      listOutlet: (state) => {
+        let data = []
+        state.options.listOutlet.forEach((item) => {
+          data.push({
+            text: item.outlet_name,
+            value: item.id_outlet,
+          })
+        })
+        return data
+      },
+      editModel: (state) => state.unit.model,
     }),
     isEdited() {
       return this.$route.params.id != null
@@ -130,12 +128,13 @@ export default {
     },
   },
   methods: {
-    // ...mapActions('companyManage', [
-    //   'createModel',
-    //   'fetchLists',
-    //   'fetchModel',
-    //   'updateModel',
-    // ]),
+    ...mapActions('unit', [
+      'createModel',
+      'fetchLists',
+      'fetchModel',
+      'updateModel',
+    ]),
+    ...mapActions('options', ['fetchListOutlet']),
 
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
@@ -145,8 +144,16 @@ export default {
       await this.fetchModel(this.editedModelId)
       if (this.editModel) {
         let dataContainer = {}
+        let arry = []
+
         Object.assign(dataContainer, this.editModel)
+        dataContainer.unit_has_outlets.forEach((item) => {
+          arry.push(item.id_outlet)
+        })
+        delete dataContainer.unit_has_outlets
+        Object.assign(this.formModel, dataContainer)
         this.formModel = dataContainer
+        this.formModel.id_outlets = arry
       }
     },
 

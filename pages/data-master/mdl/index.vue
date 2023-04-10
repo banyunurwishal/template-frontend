@@ -21,7 +21,7 @@
         <b-row class="px-3 mt-3">
           <b-col>
             <b-table
-              :items="items"
+              :items="listMdl"
               :per-page="perPage"
               :current-page="currentPage"
               responsive
@@ -66,6 +66,8 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
+
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
 
@@ -74,23 +76,21 @@ export default {
   components: { dots, plus },
   async created() {
     this.$processLoading.SHOW({})
+    await this.fetchLists()
     this.$processLoading.HIDE({})
   },
-  async created() {
-    this.$processLoading.SHOW({})
-    this.$processLoading.HIDE({})
-  },
+
   data() {
     return {
       perPage: 10,
       currentPage: 1,
       header: [
         {
-          key: 'supplier',
+          key: 'suppliers.name',
           label: 'Supplier',
         },
         {
-          key: 'material',
+          key: 'materials.name',
           label: 'Material',
         },
         {
@@ -102,36 +102,31 @@ export default {
           label: 'Actions',
         },
       ],
-      items: [
-        {
-          id: 1,
-          supplier: 'Makmur Bahagia',
-          material: 'Ayam Kecap',
-          price: '20.000',
-        },
-        {
-          id: 1,
-          supplier: 'Kokarmina',
-          material: 'Ayam Bawang',
-          price: '25.000',
-        },
-      ],
     }
   },
-  computed: {},
+  computed: {
+    rows() {
+      return this.listMdl.length
+    },
+    ...mapState({
+      listMdl: (state) => state.mdl.lists,
+    }),
+  },
   methods: {
+    ...mapActions('mdl', ['fetchLists', 'deleteModel']),
+
     handleAdd() {
       this.$router.push('/master-data/mdl/add')
     },
     handleEdit(data) {
-      this.$router.push('/master-data/mdl/' + data.id)
+      this.$router.push('/master-data/mdl/' + data.id_listing)
     },
 
     async handleDelete(data) {
       this.deleteModal().then(async (result) => {
         if (result.isConfirmed) {
           this.$processLoading.SHOW({})
-          await this.deleteModel(data.uuid)
+          await this.deleteModel(data.id)
             .then((res) => {
               this.$processLoading.HIDE({})
               this.alertToastSuccess('Data Berhasil Dihapus')

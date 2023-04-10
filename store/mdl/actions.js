@@ -2,7 +2,7 @@ export default {
   async fetchLists({ commit, state }) {
     let listParams = {}
 
-    await this.$axios.get('/staff', { params: listParams }).then((res) => {
+    await this.$axios.get('/listing', { params: listParams }).then((res) => {
       if (res.data && res.data) {
         commit('SET_LISTS', res.data.data)
       }
@@ -26,18 +26,18 @@ export default {
   },
 
   async createModel({ commit }, payload) {
-    return await this.$axios.post('/staff', payload)
+    return await this.$axios.post('/listing', payload)
   },
 
   async updateModel({ commit, state }, payload) {
     if (payload) {
-      return await this.$axios.put('/staff/' + payload.uuid, payload)
+      return await this.$axios.put('/listing/' + payload.id_listing, payload)
     }
   },
 
   async fetchModel({ commit }, id) {
     await this.$axios
-      .get('/staff/' + id)
+      .get('/listing/' + id)
       .then((res) => {
         if (res.data && res.data.data) {
           commit('SET_MODEL', res.data.data)
@@ -51,6 +51,6 @@ export default {
   },
 
   async deleteModel({}, id) {
-    return await this.$axios.delete('/staff/' + id)
+    return await this.$axios.delete('/listing/' + id)
   },
 }

@@ -2,13 +2,11 @@ export default {
   async fetchLists({ commit, state }) {
     let listParams = {}
 
-    await this.$axios
-      .get('/bank-epayment', { params: listParams })
-      .then((res) => {
-        if (res.data && res.data) {
-          commit('SET_LISTS', res.data.data)
-        }
-      })
+    await this.$axios.get('/customer', { params: listParams }).then((res) => {
+      if (res.data && res.data) {
+        commit('SET_LISTS', res.data.data)
+      }
+    })
   },
 
   async setPagination({ commit, dispatch }, payload) {
@@ -28,18 +26,18 @@ export default {
   },
 
   async createModel({ commit }, payload) {
-    return await this.$axios.post('/bank-epayment', payload)
+    return await this.$axios.post('/customer', payload)
   },
 
   async updateModel({ commit, state }, payload) {
     if (payload) {
-      return await this.$axios.put('/bank-epayment/' + payload.id_bank, payload)
+      return await this.$axios.put('/customer/' + payload.id_customer, payload)
     }
   },
 
   async fetchModel({ commit }, id) {
     await this.$axios
-      .get('/bank-epayment/' + id)
+      .get('/customer/' + id)
       .then((res) => {
         if (res.data && res.data.data) {
           commit('SET_MODEL', res.data.data)
@@ -53,6 +51,6 @@ export default {
   },
 
   async deleteModel({}, id) {
-    return await this.$axios.delete('/bank-epayment/' + id)
+    return await this.$axios.delete('/customer/' + id)
   },
 }
