@@ -59,4 +59,11 @@ export default {
       }
     })
   },
+  async fetchListProductMenu({ commit, state }, id) {
+    await this.$axios.get('product?id_department=' + id).then((res) => {
+      if (res.data && res.data) {
+        commit('SET_PRODUCT_MENU', res.data.data)
+      }
+    })
+  },
 }

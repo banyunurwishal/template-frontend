@@ -7,4 +7,5 @@ export default () => ({
   listMaterials: [],
   listProductCategory: [],
   listSideDish: [],
+  listProductMenu: [],
 })

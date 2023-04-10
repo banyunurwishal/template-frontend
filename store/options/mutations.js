@@ -23,4 +23,7 @@ export default {
   SET_SIDE_DISH: (state, payload) => {
     state.listSideDish = payload
   },
+  SET_PRODUCT_MENU: (state, payload) => {
+    state.listProductMenu = payload
+  },
 }

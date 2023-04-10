@@ -521,9 +521,6 @@ export default {
       this.$processLoading.SHOW({})
       if (this.editedModel) {
         delete this.formModel.department
-        delete this.formModel.created_at
-        delete this.formModel.deleted_at
-        delete this.formModel.updated_at
         delete this.formModel.product_has_outlets
         delete this.formModel.product_category
         this.formModel.product_price = Number(this.formModel.product_price)

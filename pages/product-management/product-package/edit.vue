@@ -55,6 +55,7 @@
                               <b-form-input
                                 :state="getValidationState(validationContext)"
                                 v-model="formModel.product_package_price"
+                                number
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -75,6 +76,7 @@
                               <b-form-input
                                 :state="getValidationState(validationContext)"
                                 v-model="formModel.product_package_cogs"
+                                number
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -95,6 +97,7 @@
                               <b-form-input
                                 :state="getValidationState(validationContext)"
                                 v-model="formModel.ppn"
+                                number
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -115,6 +118,7 @@
                               <b-form-input
                                 :state="getValidationState(validationContext)"
                                 v-model="formModel.service"
+                                number
                               >
                               </b-form-input>
                               <b-form-invalid-feedback
@@ -132,7 +136,7 @@
                           >
                             <SelectOutlet
                               :state="getValidationState(validationContext)"
-                              v-model="formModel.id_outlet"
+                              v-model="formModel.id_outlets"
                               :hasData="childOutlet"
                             />
                           </ValidationProvider>
@@ -208,13 +212,19 @@
                                     :rules="{ required: true }"
                                     v-slot="validationContext"
                                   >
-                                    <b-form-group label="Department">
+                                    <b-form-group label="Department*">
                                       <b-form-select
                                         :state="
                                           getValidationState(validationContext)
                                         "
                                         :options="listDepartment"
                                         v-model="item.id_department"
+                                        @change="
+                                          handleChangeDepartment(
+                                            item.id_department,
+                                            index
+                                          )
+                                        "
                                       >
                                       </b-form-select>
                                       <b-form-invalid-feedback
@@ -233,7 +243,10 @@
                                     :key="index2"
                                   >
                                     <div class="d-flex">
-                                      <b-form-select v-model="items.id_product">
+                                      <b-form-select
+                                        :options="item.menuObj"
+                                        v-model="items.id_product"
+                                      >
                                       </b-form-select>
                                       <b-button
                                         variant="danger"
@@ -260,12 +273,13 @@
                                     :rules="{ required: true }"
                                     v-slot="validationContext"
                                   >
-                                    <b-form-group label="Quantity">
+                                    <b-form-group label="Quantity*">
                                       <b-form-input
                                         :state="
                                           getValidationState(validationContext)
                                         "
                                         v-model="item.max_qty"
+                                        number
                                       >
                                       </b-form-input>
                                       <b-form-invalid-feedback
@@ -362,9 +376,11 @@ export default {
   },
   data() {
     return {
+      childOutlet: [],
       formModel: {
         product_package_group: [
           {
+            menuObj: {},
             id_department: '',
             product_package_menu: [],
             max_qty: '',
@@ -401,6 +417,16 @@ export default {
         })
         return data
       },
+      listProductMenu: (state) => {
+        let data = []
+        state.options.listProductMenu.forEach((item) => {
+          data.push({
+            text: item.product_name,
+            value: item.id_product,
+          })
+        })
+        return data
+      },
     }),
   },
   methods: {
@@ -410,7 +436,11 @@ export default {
       'fetchModel',
       'updateModel',
     ]),
-    ...mapActions('options', ['fetchListDepartment', 'fetchListSideDish']),
+    ...mapActions('options', [
+      'fetchListDepartment',
+      'fetchListSideDish',
+      'fetchListProductMenu',
+    ]),
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
     },
@@ -450,10 +480,96 @@ export default {
       )
     },
 
+    async handleChangeDepartment(id, index) {
+      this.$processLoading.SHOW({})
+      await this.fetchListProductMenu(id)
+      let menu = {}
+      Object.assign(menu, this.listProductMenu)
+      this.$set(this.formModel.product_package_group[index], 'menuObj', menu)
+      this.$processLoading.HIDE({})
+    },
+
     handleCancelBtn() {
       this.$router.push('/product-management/product-package')
     },
-    async onSubmit() {},
+
+    async handleEditModel() {
+      let id = await this.$route.params.id
+      await this.fetchModel(id)
+      if (this.editedModel) {
+        let dataContainer = {}
+        let outlet = []
+        let sideDish = []
+        let productPackage = []
+        Object.assign(dataContainer, this.editedModel)
+        dataContainer.product_package_has_outlets.forEach((item) => {
+          outlet.push(item.outlets.id_outlet)
+        })
+        dataContainer.product_package_sidedish.forEach((item) => {
+          sideDish.push({
+            id_sidedish: item.side_dish.id_sidedish,
+          })
+        })
+        dataContainer.product_package_group.forEach(async (item, index) => {
+          let menu = []
+          item.product_package_menu.forEach((e) => {
+            menu.push({
+              id_product: e.product.id_product,
+            })
+          })
+          productPackage.push({
+            id_department: item.id_department,
+            max_qty: item.max_qty,
+            product_package_menu: menu,
+          })
+          await this.handleChangeDepartment(item.id_department, index)
+        })
+        dataContainer.product_package_sidedish = sideDish
+        dataContainer.product_package_group = productPackage
+        this.childOutlet = outlet
+        this.formModel = dataContainer
+        console.log(this.formModel)
+      }
+    },
+
+    async onSubmit() {
+      delete this.formModel.product_package_group.forEach((item) => {
+        delete item.menuObj
+      })
+      this.$processLoading.SHOW({})
+      if (this.editedModel) {
+        this.formModel.product_package_cogs = Number(
+          this.formModel.product_package_cogs
+        )
+        this.formModel.ppn = Number(this.formModel.ppn)
+        this.formModel.service = Number(this.formModel.service)
+        await this.updateModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      } else {
+        await this.createModel(this.formModel)
+          .then((res) => {
+            this.$processLoading.HIDE({})
+            this.alertToastSuccess('Data Berhasil Disimpan')
+            this.fetchLists()
+            this.handleCancelBtn()
+          })
+          .catch((err) => {
+            this.$processLoading.HIDE({})
+            console.log(err)
+            this.alertToastFail('Data gagal Disimpan')
+          })
+      }
+    },
   },
 }
 </script>
