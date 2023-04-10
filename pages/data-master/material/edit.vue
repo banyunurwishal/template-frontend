@@ -150,6 +150,7 @@
                             <SelectOutlet
                               :state="getValidationState(validationContext)"
                               v-model="formModel.id_outlets"
+                              :hasData="childArr"
                             />
                           </ValidationProvider>
                         </b-col>
@@ -197,6 +198,7 @@ export default {
   data() {
     return {
       formModel: { po_number: 1, price: 0, ingredient_number: 0 },
+      childArr: [],
     }
   },
   computed: {
@@ -251,6 +253,7 @@ export default {
         this.formModel.po_unit = dataContainer.po_unit
         this.formModel.ingredients = dataContainer.ingredients
         this.formModel.id_outlets = arry
+        this.childArr = arry
       }
     },
 

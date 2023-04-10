@@ -62,6 +62,7 @@
                         <SelectOutlet
                           :state="getValidationState(validationContext)"
                           v-model="formModel.id_outlets"
+                          :hasData="childArr"
                         />
                       </ValidationProvider>
                     </b-card>
@@ -181,6 +182,7 @@ export default {
         Object.assign(this.formModel, dataContainer)
         this.formModel = dataContainer
         this.formModel.id_outlets = arry
+        this.childArr = arry
       }
     },
 
