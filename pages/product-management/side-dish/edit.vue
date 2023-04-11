@@ -127,60 +127,69 @@
                               Add Ingredient
                             </b-button>
                           </div>
-                          <div
-                            v-for="(item, index) in formModel.ingredients"
-                            :key="index"
-                          >
+
+                          <div v-if="formModel.ingredients.length <= 0">
+                            <emptyIngredients
+                              :state="'Ingredients data not found'"
+                              :hasIcon="['fa', 'atom']"
+                            />
+                          </div>
+                          <div v-else>
                             <div
-                              class="border rounded-lg p-3"
-                              :class="index > 0 ? 'my-3' : ''"
+                              v-for="(item, index) in formModel.ingredients"
+                              :key="index"
                             >
-                              <b-row>
-                                <b-col>
-                                  <b-form-group label="Ingredient">
-                                    <b-form-select
-                                      :options="listMaterials"
-                                      v-model="item.id_material"
-                                      @change="
-                                        handleChangeIngredient(
-                                          item.id_material,
-                                          index
-                                        )
+                              <div
+                                class="border rounded-lg p-3"
+                                :class="index > 0 ? 'my-3' : ''"
+                              >
+                                <b-row>
+                                  <b-col>
+                                    <b-form-group label="Ingredient">
+                                      <b-form-select
+                                        :options="listMaterials"
+                                        v-model="item.id_material"
+                                        @change="
+                                          handleChangeIngredient(
+                                            item.id_material,
+                                            index
+                                          )
+                                        "
+                                      >
+                                      </b-form-select>
+                                    </b-form-group>
+                                    <b-form-group label="Quantity">
+                                      <b-form-input
+                                        v-model="item.quantity"
+                                        number
+                                      >
+                                      </b-form-input>
+                                    </b-form-group>
+                                    <b-form-group label="Ingredient Unit">
+                                      <b-form-input
+                                        v-model="item.ingredientUnit"
+                                        readonly
+                                      >
+                                      </b-form-input>
+                                    </b-form-group>
+                                  </b-col>
+                                  <b-col class="text-right" align-self="start">
+                                    <b-button
+                                      variant="danger"
+                                      @click="handleDeleteItem(index)"
+                                      :class="
+                                        formModel.ingredients.length > 0
+                                          ? ''
+                                          : 'invisible'
                                       "
                                     >
-                                    </b-form-select>
-                                  </b-form-group>
-                                  <b-form-group label="Quantity">
-                                    <b-form-input
-                                      v-model="item.quantity"
-                                      number
-                                    >
-                                    </b-form-input>
-                                  </b-form-group>
-                                  <b-form-group label="Ingredient Unit">
-                                    <b-form-input
-                                      v-model="item.ingredientUnit"
-                                      readonly
-                                    >
-                                    </b-form-input>
-                                  </b-form-group>
-                                </b-col>
-                                <b-col class="text-right" align-self="start">
-                                  <b-button
-                                    variant="danger"
-                                    @click="handleDeleteItem(index)"
-                                    :class="
-                                      formModel.ingredients.length > 1
-                                        ? ''
-                                        : 'invisible'
-                                    "
-                                  >
-                                    <font-awesome-icon
-                                      :icon="['fas', 'trash']"
-                                    />
-                                  </b-button>
-                                </b-col>
-                              </b-row>
+                                      <font-awesome-icon
+                                        :icon="['fas', 'trash']"
+                                      />
+                                    </b-button>
+                                  </b-col>
+                                </b-row>
+                              </div>
                             </div>
                           </div>
                         </b-tab>
@@ -222,12 +231,13 @@
 import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
-
+import emptyIngredients from '@/components/inputable/emptyField.vue'
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
     SelectOutlet,
+    emptyIngredients,
   },
   name: 'IndexPage',
   async created() {
@@ -243,13 +253,7 @@ export default {
     return {
       childOutlet: [],
       formModel: {
-        ingredients: [
-          {
-            id_material: '',
-            quantity: '',
-            ingredientUnit: '',
-          },
-        ],
+        ingredients: [],
       },
     }
   },

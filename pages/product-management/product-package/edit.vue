@@ -151,41 +151,53 @@
                             </b-button>
                           </div>
                           <div
-                            v-for="(
-                              item, index
-                            ) in formModel.product_package_sidedish"
-                            :key="index"
+                            v-if="
+                              formModel.product_package_sidedish.length <= 0
+                            "
                           >
+                            <emptyField
+                              :state="'Sidedish data not found'"
+                              :hasIcon="['fas', 'bowl-food']"
+                            />
+                          </div>
+                          <div v-else>
                             <div
-                              class="border rounded-lg p-3"
-                              :class="index > 0 ? 'my-3' : ''"
+                              v-for="(
+                                item, index
+                              ) in formModel.product_package_sidedish"
+                              :key="index"
                             >
-                              <b-row>
-                                <b-col>
-                                  <label for="">Side dish</label>
-                                  <b-form-select
-                                    :options="listSideDish"
-                                    v-model="item.id_sidedish"
-                                  >
-                                  </b-form-select>
-                                </b-col>
-                                <b-col class="text-right" align-self="start">
-                                  <b-button
-                                    variant="danger"
-                                    @click="handleDeleteItemSideDish(index)"
-                                    :class="
-                                      formModel.product_package_sidedish
-                                        .length > 1
-                                        ? ''
-                                        : 'invisible'
-                                    "
-                                  >
-                                    <font-awesome-icon
-                                      :icon="['fas', 'trash']"
-                                    />
-                                  </b-button>
-                                </b-col>
-                              </b-row>
+                              <div
+                                class="border rounded-lg p-3"
+                                :class="index > 0 ? 'my-3' : ''"
+                              >
+                                <b-row>
+                                  <b-col>
+                                    <label for="">Side dish</label>
+                                    <b-form-select
+                                      :options="listSideDish"
+                                      v-model="item.id_sidedish"
+                                    >
+                                    </b-form-select>
+                                  </b-col>
+                                  <b-col class="text-right" align-self="start">
+                                    <b-button
+                                      variant="danger"
+                                      @click="handleDeleteItemSideDish(index)"
+                                      :class="
+                                        formModel.product_package_sidedish
+                                          .length > 1
+                                          ? ''
+                                          : 'invisible'
+                                      "
+                                    >
+                                      <font-awesome-icon
+                                        :icon="['fas', 'trash']"
+                                      />
+                                    </b-button>
+                                  </b-col>
+                                </b-row>
+                              </div>
                             </div>
                           </div>
                         </b-tab>
@@ -256,7 +268,7 @@
                                         "
                                         :class="
                                           formModel.product_package_group[index]
-                                            .product_package_menu.length > 0
+                                            .product_package_menu.length > 1
                                             ? ''
                                             : 'invisible'
                                         "
@@ -296,7 +308,7 @@
                                     variant="danger"
                                     @click="handleDeleteItem(index)"
                                     :class="
-                                      formModel.product_package_group.length > 1
+                                      formModel.product_package_group.length > 0
                                         ? ''
                                         : 'invisible'
                                     "
@@ -357,12 +369,13 @@
 import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
-
+import emptyField from '@/components/inputable/emptyField.vue'
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
     SelectOutlet,
+    emptyField,
   },
   name: 'IndexPage',
   async created() {
@@ -378,19 +391,8 @@ export default {
     return {
       childOutlet: [],
       formModel: {
-        product_package_group: [
-          {
-            menuObj: {},
-            id_department: '',
-            product_package_menu: [],
-            max_qty: '',
-          },
-        ],
-        product_package_sidedish: [
-          {
-            id_sidedish: '',
-          },
-        ],
+        product_package_group: [],
+        product_package_sidedish: [],
       },
     }
   },

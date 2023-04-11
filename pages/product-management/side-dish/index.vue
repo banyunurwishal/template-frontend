@@ -133,7 +133,7 @@ export default {
   },
   computed: {
     ...mapState({
-      listSideDish: (state) => state.sideDish.lists,
+      listSideDish: (state) => state.sidedish.lists,
     }),
   },
   methods: {

@@ -37,7 +37,11 @@
               hover
               striped
               class="table-header shadow-table"
+              show-empty
             >
+              <template #empty="data">
+                <emptyTable />
+              </template>
               <template #cell(outlet)="data">
                 <span
                   v-for="(item, index) in data.item.bank_has_outlets"

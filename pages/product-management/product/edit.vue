@@ -234,39 +234,49 @@
                               Add Side Dish
                             </b-button>
                           </div>
-                          <div
-                            v-for="(item, index) in formModel.product_sidedish"
-                            :key="index"
-                          >
+                          <div v-if="formModel.product_sidedish.length <= 0">
+                            <emptyField
+                              :state="'Side dish data not found'"
+                              :hasIcon="['fas', 'bowl-food']"
+                            />
+                          </div>
+                          <div v-else>
                             <div
-                              class="border rounded-lg p-3"
-                              :class="index > 0 ? 'my-3' : ''"
+                              v-for="(
+                                item, index
+                              ) in formModel.product_sidedish"
+                              :key="index"
                             >
-                              <b-row>
-                                <b-col>
-                                  <label for="">Side dish</label>
-                                  <b-form-select
-                                    :options="listSideDish"
-                                    v-model="item.id_sidedish"
-                                  >
-                                  </b-form-select>
-                                </b-col>
-                                <b-col class="text-right" align-self="start">
-                                  <b-button
-                                    variant="danger"
-                                    @click="handleDeleteItemSideDish(index)"
-                                    :class="
-                                      formModel.product_sidedish.length > 1
-                                        ? ''
-                                        : 'invisible'
-                                    "
-                                  >
-                                    <font-awesome-icon
-                                      :icon="['fas', 'trash']"
-                                    />
-                                  </b-button>
-                                </b-col>
-                              </b-row>
+                              <div
+                                class="border rounded-lg p-3"
+                                :class="index > 0 ? 'my-3' : ''"
+                              >
+                                <b-row>
+                                  <b-col>
+                                    <label for="">Side dish</label>
+                                    <b-form-select
+                                      :options="listSideDish"
+                                      v-model="item.id_sidedish"
+                                    >
+                                    </b-form-select>
+                                  </b-col>
+                                  <b-col class="text-right" align-self="start">
+                                    <b-button
+                                      variant="danger"
+                                      @click="handleDeleteItemSideDish(index)"
+                                      :class="
+                                        formModel.product_sidedish.length > 0
+                                          ? ''
+                                          : 'invisible'
+                                      "
+                                    >
+                                      <font-awesome-icon
+                                        :icon="['fas', 'trash']"
+                                      />
+                                    </b-button>
+                                  </b-col>
+                                </b-row>
+                              </div>
                             </div>
                           </div>
                         </b-tab>
@@ -276,49 +286,57 @@
                               Add Ingredient
                             </b-button>
                           </div>
-                          <div
-                            v-for="(
-                              item, index
-                            ) in formModel.product_ingredient"
-                            :key="index"
-                          >
+                          <div v-if="formModel.product_ingredient.length <= 0">
+                            <emptyField
+                              :state="'Ingredients data not found'"
+                              :hasIcon="['fa', 'atom']"
+                            />
+                          </div>
+                          <div v-else>
                             <div
-                              class="border rounded-lg p-3"
-                              :class="index > 0 ? 'my-3' : ''"
+                              v-for="(
+                                item, index
+                              ) in formModel.product_ingredient"
+                              :key="index"
                             >
-                              <b-row>
-                                <b-col>
-                                  <b-form-group label="Ingredient">
-                                    <b-form-select
-                                      :options="listMaterials"
-                                      v-model="item.id_material"
+                              <div
+                                class="border rounded-lg p-3"
+                                :class="index > 0 ? 'my-3' : ''"
+                              >
+                                <b-row>
+                                  <b-col>
+                                    <b-form-group label="Ingredient">
+                                      <b-form-select
+                                        :options="listMaterials"
+                                        v-model="item.id_material"
+                                      >
+                                      </b-form-select>
+                                    </b-form-group>
+                                    <b-form-group label="Quantity">
+                                      <b-form-input
+                                        number
+                                        v-model="item.quantity"
+                                      >
+                                      </b-form-input>
+                                    </b-form-group>
+                                  </b-col>
+                                  <b-col class="text-right" align-self="start">
+                                    <b-button
+                                      variant="danger"
+                                      @click="handleDeleteItem(index)"
+                                      :class="
+                                        formModel.product_ingredient.length > 0
+                                          ? ''
+                                          : 'invisible'
+                                      "
                                     >
-                                    </b-form-select>
-                                  </b-form-group>
-                                  <b-form-group label="Quantity">
-                                    <b-form-input
-                                      number
-                                      v-model="item.quantity"
-                                    >
-                                    </b-form-input>
-                                  </b-form-group>
-                                </b-col>
-                                <b-col class="text-right" align-self="start">
-                                  <b-button
-                                    variant="danger"
-                                    @click="handleDeleteItem(index)"
-                                    :class="
-                                      formModel.product_ingredient.length > 1
-                                        ? ''
-                                        : 'invisible'
-                                    "
-                                  >
-                                    <font-awesome-icon
-                                      :icon="['fas', 'trash']"
-                                    />
-                                  </b-button>
-                                </b-col>
-                              </b-row>
+                                      <font-awesome-icon
+                                        :icon="['fas', 'trash']"
+                                      />
+                                    </b-button>
+                                  </b-col>
+                                </b-row>
+                              </div>
                             </div>
                           </div>
                         </b-tab>
@@ -360,12 +378,14 @@
 import { mapActions, mapState } from 'vuex'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import SelectOutlet from '@/components/form/SelectOutlet/index.vue'
+import emptyField from '@/components/inputable/emptyField.vue'
 
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
     SelectOutlet,
+    emptyField,
   },
   name: 'IndexPage',
   async created() {
