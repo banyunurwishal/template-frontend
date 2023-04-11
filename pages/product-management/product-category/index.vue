@@ -37,7 +37,11 @@
               hover
               striped
               class="table-header shadow-table"
+              show-empty
             >
+              <template #empty="data">
+                <emptyTable />
+              </template>
               <template #cell(outlet)="data">
                 <span
                   v-for="(item, index) in data.item
@@ -90,10 +94,11 @@
 import { mapActions, mapState } from 'vuex'
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
+import emptyTable from '@/components/inputable/emptyTable.vue'
 
 export default {
   name: 'IndexPage',
-  components: { dots, plus },
+  components: { dots, plus, emptyTable },
   async created() {
     this.$processLoading.SHOW({})
     await this.fetchLists()

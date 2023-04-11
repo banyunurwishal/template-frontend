@@ -38,8 +38,24 @@
               striped
               class="table-header shadow-table"
             >
+              <template #cell(outlet)="data">
+                <span
+                  v-for="(item, index) in data.item.bank_has_outlets"
+                  :key="index"
+                >
+                  {{
+                    index > 0
+                      ? ', ' + item.outlets.outlet_name
+                      : item.outlets.outlet_name
+                  }}
+                </span>
+              </template>
               <template #cell(type)="data">
-                <span>{{ data.bank_type != 1 ? 'Bank' : 'E-Payment' }}</span>
+                <div v-if="data.item.bank_type === 1"><span>Bank</span></div>
+                <div v-else-if="data.item.bank_type === 2">
+                  <span>E-Payment</span>
+                </div>
+                <div v-else>-</div>
               </template>
               <template #cell(actions)="data">
                 <b-dropdown
@@ -81,10 +97,11 @@ import { mapActions, mapState } from 'vuex'
 
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
+import emptyTable from '@/components/inputable/emptyTable.vue'
 
 export default {
   name: 'IndexPage',
-  components: { dots, plus },
+  components: { dots, plus, emptyTable },
   async created() {
     this.$processLoading.SHOW({})
     await this.fetchLists()
@@ -96,6 +113,10 @@ export default {
       currentPage: 1,
       perPage: 5,
       fields: [
+        {
+          key: 'outlet',
+          label: 'Outlet Name',
+        },
         {
           key: 'bank_name',
           label: 'Bank',

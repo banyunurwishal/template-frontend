@@ -29,7 +29,23 @@
               striped
               class="table-header shadow-table"
               :fields="header"
+              show-empty
             >
+              <template #empty="data">
+                <emptyTable />
+              </template>
+              <template #cell(outlet)="data">
+                <span
+                  v-for="(item, index) in data.item.supplier_has_outlets"
+                  :key="index"
+                >
+                  {{
+                    index > 0
+                      ? ', ' + item.outlets.outlet_name
+                      : item.outlets.outlet_name
+                  }}
+                </span>
+              </template>
               <template #cell(actions)="row" class="text-right">
                 <b-dropdown
                   variant="link"
@@ -69,10 +85,11 @@
 import { mapActions, mapState } from 'vuex'
 import dots from '@/assets/icon/dots.vue'
 import plus from '@/assets/icon/plus.vue'
+import emptyTable from '@/components/inputable/emptyTable.vue'
 
 export default {
   name: 'supplier',
-  components: { dots, plus },
+  components: { dots, plus, emptyTable },
   async created() {
     this.$processLoading.SHOW({})
     await this.fetchLists()
@@ -85,6 +102,10 @@ export default {
       perPage: 10,
       currentPage: 1,
       header: [
+        {
+          key: 'outlet',
+          label: 'Outlet Name',
+        },
         {
           key: 'name',
           label: 'Name',

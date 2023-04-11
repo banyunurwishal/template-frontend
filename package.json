@@ -1,6 +1,6 @@
 {
   "name": "qoligo-platform",
-  "version": "0.5.3",
+  "version": "0.5.6",
   "private": true,
   "scripts": {
     "dev": "nuxt",

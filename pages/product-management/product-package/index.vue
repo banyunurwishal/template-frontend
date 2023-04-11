@@ -55,7 +55,11 @@
               hover
               striped
               class="table-header shadow-table"
+              show-empty
             >
+              <template #empty="data">
+                <emptyTable />
+              </template>
               <template #cell(outlet)="data">
                 <span
                   v-for="(item, index) in data.item.product_package_has_outlets"
@@ -108,10 +112,11 @@ import dots from '@/assets/icon/dots.vue'
 import importIcon from '@/assets/icon/import.vue'
 import exportIcon from '@/assets/icon/export.vue'
 import { mapActions, mapState } from 'vuex'
+import emptyTable from '@/components/inputable/emptyTable.vue'
 
 export default {
   name: 'IndexPage',
-  components: { importIcon, exportIcon, dots },
+  components: { importIcon, exportIcon, dots, emptyTable },
   async created() {
     this.$processLoading.SHOW({})
     await this.fetchLists()
