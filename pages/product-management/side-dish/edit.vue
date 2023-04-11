@@ -73,6 +73,7 @@
                           >
                             <b-form-group label="Price*">
                               <b-form-input
+                                type="number"
                                 :state="getValidationState(validationContext)"
                                 number
                                 v-model="formModel.sidedish_price"
@@ -94,6 +95,7 @@
                           >
                             <b-form-group label="Cost of Good Sold*">
                               <b-form-input
+                                type="number"
                                 :state="getValidationState(validationContext)"
                                 number
                                 v-model="formModel.sidedish_cogs"

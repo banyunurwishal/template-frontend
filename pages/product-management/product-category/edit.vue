@@ -65,6 +65,7 @@
                         <SelectOutlet
                           :state="getValidationState(validationContext)"
                           v-model="formModel.id_outlet"
+                          :hasData="childOutlet"
                         />
                       </ValidationProvider>
                     </b-card>
@@ -122,6 +123,7 @@ export default {
   },
   data() {
     return {
+      childOutlet: [],
       formModel: {},
     }
   },
@@ -162,7 +164,12 @@ export default {
       console.log(this.editedModel)
       if (this.editedModel) {
         let dataContainer = {}
+        let outlet = []
         Object.assign(dataContainer, this.editedModel)
+        dataContainer.product_category_has_outlets.forEach((item) => {
+          outlet.push(item.outlets.id_outlet)
+        })
+        this.childOutlet = outlet
         this.formModel = dataContainer
       }
     },
@@ -170,6 +177,8 @@ export default {
     async onSubmit() {
       this.$processLoading.SHOW({})
       if (this.editedModel) {
+        delete this.formModel.department
+        delete this.formModel.product_category_has_outlets
         await this.updateModel(this.formModel)
           .then((res) => {
             this.$processLoading.HIDE({})

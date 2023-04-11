@@ -38,6 +38,19 @@
               striped
               class="table-header shadow-table"
             >
+              <template #cell(outlet)="data">
+                <span
+                  v-for="(item, index) in data.item
+                    .product_category_has_outlets"
+                  :key="index"
+                >
+                  {{
+                    index > 0
+                      ? ', ' + item.outlets.outlet_name
+                      : item.outlets.outlet_name
+                  }}
+                </span>
+              </template>
               <template #cell(actions)="data">
                 <b-dropdown
                   variant="link"
@@ -90,16 +103,9 @@ export default {
     return {
       currentPage: 1,
       perPage: 5,
-      items: [
-        {
-          outlet_name: 'name',
-          department: 'name',
-          category_name: 'name',
-        },
-      ],
       fields: [
         {
-          key: 'outlet.outlet_name',
+          key: 'outlet',
           label: 'Outlet Name',
         },
         {

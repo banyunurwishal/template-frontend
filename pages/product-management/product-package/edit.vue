@@ -269,11 +269,11 @@
                                   </b-form-group>
 
                                   <ValidationProvider
-                                    name="Quantity"
+                                    name="Max Quantity"
                                     :rules="{ required: true }"
                                     v-slot="validationContext"
                                   >
-                                    <b-form-group label="Quantity*">
+                                    <b-form-group label="Max Quantity*">
                                       <b-form-input
                                         :state="
                                           getValidationState(validationContext)

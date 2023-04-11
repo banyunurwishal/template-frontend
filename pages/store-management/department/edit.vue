@@ -46,6 +46,7 @@
                       >
                         <SelectOutlet
                           :state="getValidationState(validationContext)"
+                          :hasData="childOutlet"
                           v-model="formModel.id_outlet"
                         />
                       </ValidationProvider>
@@ -103,6 +104,7 @@ export default {
   },
   data() {
     return {
+      childOutlet: [],
       formModel: {},
       optionsCompany: [
         { value: null, text: 'Please select an option' },
@@ -141,7 +143,12 @@ export default {
       await this.fetchModel(id)
       if (this.editedModel) {
         let dataContainer = {}
+        let outlet = []
         Object.assign(dataContainer, this.editedModel)
+        dataContainer.department_has_outlets.forEach((item) => {
+          outlet.push(item.outlets.id_outlet)
+        })
+        this.childOutlet = outlet
         this.formModel = dataContainer
       }
     },
