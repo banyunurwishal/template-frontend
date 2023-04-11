@@ -28,22 +28,23 @@
                 class="py-3"
                 style="position: relative; overflow-y: auto; height: 200px"
               >
-                <!-- <b-form-checkbox-group
+                <b-form-checkbox-group
                   v-model="hasData"
                   :options="listOutlet"
                   class="ml-3"
                   :state="state"
                   stacked
+                  v-if="hasData"
                   @input="$emit('input', $event)"
                   @change="$emit('change', $event)"
-                ></b-form-checkbox-group> -->
-                {{ hasData }}
+                ></b-form-checkbox-group>
                 <b-form-checkbox-group
-                  :v-model="hasData.length == 0 ? selected : hasData"
+                  v-model="selected"
                   :options="listOutlet"
                   class="ml-3"
                   :state="state"
                   stacked
+                  v-else
                   @input="$emit('input', $event)"
                   @change="$emit('change', $event)"
                 ></b-form-checkbox-group>
@@ -93,12 +94,8 @@ export default {
     }),
     handleSearch() {
       return this.listOutlet.filter((e) => {
-        return e.text.toLowerCase().includes(this.search.toLowerCase())
+        return e.toLowerCase().includes(this.search.toLowerCase())
       })
-    },
-
-    handleHasData() {
-      return (this.selected = this.hasData)
     },
   },
   mounted() {},
@@ -108,32 +105,37 @@ export default {
       return dirty || validated ? valid : null
     },
     async toggleAll(checked) {
-      checked
-        ? this.listOutlet.forEach((items) => {
-            this.selected.push(items.value)
+      if (checked) {
+        this.listOutlet.forEach((e) => {
+          this.selected.push(e.value)
+        })
+        if (this.hasData) {
+          this.listOutlet.forEach((e) => {
+            this.hasData.push(e.value)
           })
-        : (this.selected = [])
-      // if (checked) {
-      //   if (this.hasData) {
-      //     this.listOutlet.forEach((e) => {
-      //       this.hasData.push(e.value)
-      //     })
-      //   } else {
-      //     this.listOutlet.forEach((e) => {
-      //       this.selected.push(e.value)
-      //     })
-      //   }
-      // } else {
-      //   if (this.hasData) {
-      //     this.hasData = []
-      //   } else {
-      //     this.selected = []
-      //   }
-      // }
+        }
+      } else {
+        if (this.hasData) {
+          this.hasData = []
+        }
+        this.selected = []
+      }
     },
   },
   watch: {
     selected(newValue, oldValue) {
+      if (newValue.length === 0) {
+        this.indeterminate = false
+        this.allSelected = false
+      } else if (newValue.length === this.listOutlet.length) {
+        this.indeterminate = false
+        this.allSelected = true
+      } else {
+        this.indeterminate = true
+        this.allSelected = false
+      }
+    },
+    hasData(newValue, oldValue) {
       if (newValue.length === 0) {
         this.indeterminate = false
         this.allSelected = false
