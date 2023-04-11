@@ -383,17 +383,8 @@ export default {
     return {
       childOutlet: [],
       formModel: {
-        product_ingredient: [
-          {
-            id_material: '',
-            quantity: null,
-          },
-        ],
-        product_sidedish: [
-          {
-            id_sidedish: '',
-          },
-        ],
+        product_ingredient: [],
+        product_sidedish: [],
       },
     }
   },
