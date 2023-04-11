@@ -9,11 +9,7 @@
             <div
               class="border border-primary rounded-top p-3 mt-2 border-primary"
             >
-              <b-form-checkbox
-                v-model="allSelected"
-                :indeterminate="indeterminate"
-                @change="toggleAll"
-              >
+              <b-form-checkbox v-model="allSelected" @change="toggleAll">
                 Select All
               </b-form-checkbox>
             </div>
@@ -23,28 +19,18 @@
                 class="rounded-10 border"
                 type="search"
                 placeholder="Search"
+                @keyup="handleSearch"
               ></b-form-input>
               <div
                 class="py-3"
                 style="position: relative; overflow-y: auto; height: 200px"
               >
                 <b-form-checkbox-group
-                  v-model="hasData"
-                  :options="listOutlet"
-                  class="ml-3"
-                  :state="state"
-                  stacked
-                  v-if="hasData"
-                  @input="$emit('input', $event)"
-                  @change="$emit('change', $event)"
-                ></b-form-checkbox-group>
-                <b-form-checkbox-group
                   v-model="selected"
-                  :options="listOutlet"
+                  :options="options"
                   class="ml-3"
                   :state="state"
                   stacked
-                  v-else
                   @input="$emit('input', $event)"
                   @change="$emit('change', $event)"
                 ></b-form-checkbox-group>
@@ -62,22 +48,32 @@
 import { mapActions, mapState } from 'vuex'
 
 export default {
+  props: {
+    state: null,
+    hasData: [],
+  },
   async created() {
     this.$processLoading.SHOW({})
     await this.fetchListOutlet()
+    if (this.listOutlet) {
+      this.listOutlet.forEach((item) => {
+        this.options.push({
+          text: item.text,
+          value: item.value,
+        })
+      })
+    }
+    console.log(this.options)
     this.$processLoading.HIDE({})
   },
   data() {
     return {
       search: '',
       selected: [],
+      options: [],
       allSelected: false,
       indeterminate: false,
     }
-  },
-  props: {
-    state: null,
-    hasData: [],
   },
   computed: {
     ...mapState({
@@ -92,11 +88,6 @@ export default {
         return data
       },
     }),
-    handleSearch() {
-      return this.listOutlet.filter((e) => {
-        return e.toLowerCase().includes(this.search.toLowerCase())
-      })
-    },
   },
   mounted() {},
   methods: {
@@ -104,48 +95,32 @@ export default {
     getValidationState({ dirty, validated, valid = null }) {
       return dirty || validated ? valid : null
     },
+
     async toggleAll(checked) {
-      if (checked) {
-        this.listOutlet.forEach((e) => {
-          this.selected.push(e.value)
-        })
-        if (this.hasData) {
-          this.listOutlet.forEach((e) => {
-            this.hasData.push(e.value)
+      checked
+        ? this.listOutlet.forEach((e) => {
+            this.selected.push(e.value)
           })
-        }
-      } else {
-        if (this.hasData) {
-          this.hasData = []
-        }
-        this.selected = []
-      }
+        : (this.selected = [])
+    },
+
+    handleSearch() {
+      let filter = this.listOutlet.filter((e) => {
+        return e.text.toLowerCase().includes(this.search.toLowerCase())
+      })
+      this.options = filter
     },
   },
   watch: {
     selected(newValue, oldValue) {
-      if (newValue.length === 0) {
-        this.indeterminate = false
+      if (newValue.length < this.options.length) {
         this.allSelected = false
-      } else if (newValue.length === this.listOutlet.length) {
-        this.indeterminate = false
+      } else if (newValue.length === this.options.length) {
         this.allSelected = true
-      } else {
-        this.indeterminate = true
-        this.allSelected = false
       }
     },
-    hasData(newValue, oldValue) {
-      if (newValue.length === 0) {
-        this.indeterminate = false
-        this.allSelected = false
-      } else if (newValue.length === this.listOutlet.length) {
-        this.indeterminate = false
-        this.allSelected = true
-      } else {
-        this.indeterminate = true
-        this.allSelected = false
-      }
+    hasData(value) {
+      this.selected = value
     },
   },
 }
