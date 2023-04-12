@@ -6,7 +6,7 @@ export default {
     company: 'Company',
     companies: 'Companies',
     outlets: 'Outlets',
-    departments: 'Departement',
+    departments: 'Department',
     tableManagement: 'Table Management',
     section: 'Section',
     table: 'Table',
