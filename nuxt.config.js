@@ -1,7 +1,7 @@
 export default {
   publicRuntimeConfig: {
     axios: {
-      baseURL: process.env.API_BASEURL || 'http://127.0.0.1:4000/',
+      // baseURL: process.env.API_BASEURL || 'http://127.0.0.1:4000/',
     },
   },
   server: {
@@ -10,7 +10,7 @@ export default {
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'Qoligo Platform',
+    title: 'Kokarmina',
     htmlAttrs: {
       lang: 'en',
     },
@@ -132,15 +132,16 @@ export default {
     strategies: {
       local: {
         endpoints: {
-          login: { url: 'auth', method: 'post' },
+          // login: { url: 'auth', method: 'post' },
+          login: false,
           user: false,
           logout: false,
         },
       },
     },
     redirect: {
-      login: '/login',
-      home: '/',
+      // login: '/login',
+      // home: '/',
     },
   },
 

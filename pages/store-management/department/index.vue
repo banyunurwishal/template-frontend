@@ -42,18 +42,6 @@
               <template #empty="data">
                 <emptyTable />
               </template>
-              <template #cell(outlet)="data">
-                <span
-                  v-for="(item, index) in data.item.department_has_outlets"
-                  :key="index"
-                >
-                  {{
-                    index > 0
-                      ? ', ' + item.outlets.outlet_name
-                      : item.outlets.outlet_name
-                  }}
-                </span>
-              </template>
               <template #cell(actions)="data">
                 <b-dropdown
                   variant="link"
@@ -100,7 +88,7 @@ export default {
   components: { dots, plus, emptyTable },
   async created() {
     this.$processLoading.SHOW({})
-    await this.fetchLists()
+    // await this.fetchLists()
     this.$processLoading.HIDE({})
   },
   data() {
@@ -121,40 +109,46 @@ export default {
           label: 'Actions',
         },
       ],
+      listDepartment: [
+        {
+          outlet: 'outlet',
+          department_name: 'Outlet Name',
+        },
+      ],
     }
   },
   computed: {
     ...mapState({
-      listDepartment: (state) => state.department.lists,
+      // listDepartment: (state) => state.department.lists,
     }),
   },
   methods: {
-    ...mapActions('department', ['fetchLists', 'deleteModel']),
+    // ...mapActions('department', ['fetchLists', 'deleteModel']),
     handleAdd() {
       this.$router.push('/store-management/departments/add')
     },
 
     handleEdit(data) {
-      this.$router.push('/store-management/departments/' + data.id_department)
+      this.$router.push('/store-management/departments/' + data.id)
     },
 
     async handleDelete(data) {
-      this.deleteModal().then(async (result) => {
-        if (result.isConfirmed) {
-          this.$processLoading.SHOW({})
-          await this.deleteModel(data.id_department)
-            .then((res) => {
-              this.$processLoading.HIDE({})
-              this.alertToastSuccess('Data Berhasil Dihapus')
-              this.fetchLists()
-            })
-            .catch((err) => {
-              console.log(err)
-              this.$processLoading.HIDE({})
-              this.alertToastFail('Data Gagal Dihapus')
-            })
-        }
-      })
+      // this.deleteModal().then(async (result) => {
+      //   if (result.isConfirmed) {
+      //     this.$processLoading.SHOW({})
+      //     await this.deleteModel(data.id_department)
+      //       .then((res) => {
+      //         this.$processLoading.HIDE({})
+      //         this.alertToastSuccess('Data Berhasil Dihapus')
+      //         this.fetchLists()
+      //       })
+      //       .catch((err) => {
+      //         console.log(err)
+      //         this.$processLoading.HIDE({})
+      //         this.alertToastFail('Data Gagal Dihapus')
+      //       })
+      //   }
+      // })
     },
   },
 }

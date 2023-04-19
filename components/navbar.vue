@@ -34,9 +34,9 @@
                 class="rounded-circle mr-1"
             /></a>
             <div class="dropdown-menu dropdown-menu-right">
-              <a class="dropdown-item has-icon">
+              <!-- <a class="dropdown-item has-icon">
                 <i class="far fa-user"></i> Profile
-              </a>
+              </a> -->
               <div class="dropdown-divider"></div>
               <a
                 @click="handleLogout"
@@ -71,7 +71,7 @@
                 }}</span></a
               >
               <ul class="dropdown-menu bg-primary">
-                <!-- <li class="pointer" @click="handleCompany">
+                <li class="pointer" @click="handleCompany">
                   <a class="nav-link nav-hover bg-primary text-white">{{
                     $t('sidebar.company')
                   }}</a>
@@ -80,106 +80,10 @@
                   <a class="nav-link nav-hover bg-primary text-white">{{
                     $t('sidebar.outlets')
                   }}</a>
-                </li> -->
+                </li>
                 <li class="pointer" @click="handleDepartment">
                   <a class="nav-link nav-hover bg-primary text-white">{{
                     $t('sidebar.departments')
-                  }}</a>
-                </li>
-              </ul>
-            </li>
-            <!-- <li class="nav-item dropdown">
-              <a class="nav-link has-dropdown text-white pointer"
-                ><tableIcon /><span class="text-white">{{
-                  $t('sidebar.tableManagement')
-                }}</span></a
-              >
-              <ul class="dropdown-menu bg-primary">
-                <li class="pointer" @click="handleSection">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.section')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handleTable">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.table')
-                  }}</a>
-                </li>
-              </ul>
-            </li> -->
-            <li class="nav-item dropdown">
-              <a class="nav-link has-dropdown text-white pointer"
-                ><productIcon /><span class="text-white">{{
-                  $t('sidebar.productManagement')
-                }}</span></a
-              >
-              <ul class="dropdown-menu bg-primary">
-                <li class="pointer" @click="handleCategory">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.productCategory')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handleSide">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.sideDish')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handleProduct">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.product')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handlePackage">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.productPackage')
-                  }}</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link has-dropdown text-white pointer"
-                ><paymentIcon /><span class="text-white">{{
-                  $t('sidebar.paymentManagement')
-                }}</span></a
-              >
-              <ul class="dropdown-menu bg-primary">
-                <li class="pointer" @click="handleBank">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.bank')
-                  }}</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link has-dropdown text-white pointer"
-                ><tableIcon /><span class="text-white">{{
-                  $t('sidebar.dataMaster')
-                }}</span></a
-              >
-              <ul class="dropdown-menu bg-primary">
-                <li class="pointer" @click="handleCustomer">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.customer')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handleMdl">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.mdl')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handleMaterial">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.material')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handleSupplier">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.supplier')
-                  }}</a>
-                </li>
-                <li class="pointer" @click="handleUnit">
-                  <a class="nav-link nav-hover bg-primary text-white">{{
-                    $t('sidebar.unit')
                   }}</a>
                 </li>
               </ul>
@@ -244,23 +148,6 @@ export default {
       this.$router.push('/')
     },
 
-    // master data
-    handleUnit() {
-      this.$router.push('/master-data/unit')
-    },
-    handleMaterial() {
-      this.$router.push('/master-data/material')
-    },
-    handleSupplier() {
-      this.$router.push('/master-data/supplier')
-    },
-    handleMdl() {
-      this.$router.push('/master-data/mdl')
-    },
-    handleCustomer() {
-      this.$router.push('/master-data/customer')
-    },
-
     // store
     handleOutlet() {
       this.$router.push('/store-management/outlets')
@@ -270,24 +157,6 @@ export default {
     },
     handleDepartment() {
       this.$router.push('/store-management/departments')
-    },
-
-    // product
-    handleCategory() {
-      this.$router.push('/product-management/product-category')
-    },
-    handleSide() {
-      this.$router.push('/product-management/side-dish')
-    },
-    handleProduct() {
-      this.$router.push('/product-management/product')
-    },
-    handlePackage() {
-      this.$router.push('/product-management/product-package')
-    },
-    // payment
-    handleBank() {
-      this.$router.push('/payment-management/payment')
     },
 
     handleLogout() {
